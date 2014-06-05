@@ -1,0 +1,28 @@
+{
+   "minimum_chrome_version": "28.0.0",
+   "version": "0.3.0",
+   "manifest_version": 2,
+   "name": "买便宜！",
+   "options_page": "options.html",
+   "icons": {
+      "128": "icon128.png",
+      "16": "icon16.png",
+      "32": "icon32.png"
+   },
+   "update_url": "http://fe.baidu.com/doc/kuang/tool/box-chrome/updates.xml",
+   "permissions": ["tabs", "webRequest", "https://*/*", "http://*/*","notifications"],
+   "background": {
+      "persistent": true,
+      "scripts": ["js/jquery.js","background.js"]
+   },
+   "browser_action": {
+      "default_icon": "icon128.png",
+      "default_popup": "popup.html",
+      "default_title": "买便宜！"
+   },
+   "web_accessible_resources": [
+      "css/*.css",
+      "img/*",
+      "js/*"
+   ]
+}
