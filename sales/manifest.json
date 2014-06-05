@@ -6,8 +6,7 @@
    "options_page": "options.html",
    "icons": {
       "128": "icon128.png",
-      "16": "icon16.png",
-      "32": "icon32.png"
+      "64": "icon64.png"
    },
    "update_url": "http://fe.baidu.com/doc/kuang/tool/box-chrome/updates.xml",
    "permissions": ["tabs", "webRequest", "https://*/*", "http://*/*","notifications"],

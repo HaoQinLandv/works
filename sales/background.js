@@ -1,253 +1,10 @@
 var ls = window.localStorage;
-var URLreg = /^(?:(\w+):\/\/)?(?:(\w+):?(\w+)?@)?([^:\/\?#]+)(?::(\d+))?(\/[^\?#]+)?(?:\?([^#]+))?(?:#(\w+))?/;
 //规则放在localstorage
 var ruleList = null;
 //当前设置放在setting
 var setting = {
-    uaDomains: {},
-    maps: [],
-    contentScripts: [],
-    //需要清理的inject js/css
-    needToClearContentScripts: []
+
 };
-var MIME = {
-    'txt': 'text/plain',
-    'html': 'text/html',
-    'css': 'text/css',
-    'js': 'text/javascript',
-    'json': 'text/json',
-    'xml': 'text/xml',
-    'jpg': 'image/jpeg',
-    'gif': 'image/gif',
-    'png': 'image/png',
-    'webp': 'image/webp'
-};
-
-function getRule() {
-    ruleList = window.localStorage.ruleList ? JSON.parse(window.localStorage.ruleList) : ruleList;
-}
-getRule();
-if (!ruleList) {
-    getJson('./rule.json', function(j) {
-        ruleList = j;
-        ls.ruleList = JSON.stringify(j);
-    });
-}
-
-
-function getLocalFileUrl(url) {
-    var arr = url.split('.');
-    var type = arr[arr.length - 1];
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', url, false);
-    xhr.send(null);
-    var content = xhr.responseText || xhr.responseXML;
-    if (!content) {
-        return false;
-    }
-    content = encodeURIComponent(
-        type === 'js' ?
-        content.replace(/[\u0080-\uffff]/g, function($0) {
-            var str = $0.charCodeAt(0).toString(16);
-            return '\\u' + '00000'.substr(0, 4 - str.length) + str;
-        }) : content
-    );
-    return ('data:' + (MIME[type] || MIME.txt) + ';charset=utf-8,' + content);
-}
-window.addEventListener('storage', getRule, false);
-
-//监控请求，更换url
-chrome.webRequest.onBeforeRequest.addListener(function(details) {
-    var url = details.url;
-
-    var maps = ruleList.maps || [];
-    var mapIds = setting.maps || [];
-    for (var n = 0, len = mapIds.length; n < len; n++) {
-        var i = mapIds[n];
-        var map = maps[i];
-        if (map && map.match) {
-            var reg = new RegExp(map.match, 'gi');
-            if (reg.test(url)) {
-                //匹配成功
-                if (/^file:\/\//.test(map.res)) {
-                    //本地文件
-                    return {
-                        redirectUrl: getLocalFileUrl(url.replace(reg, map.res))
-                    };
-                } else {
-                    return {
-                        redirectUrl: url.replace(reg, map.res)
-                    };
-                }
-            }
-        }
-    }
-
-    return {};
-}, {
-    urls: ['<all_urls>']
-}, ['blocking']);
-
-//监控请求头，设置userAgent
-chrome.webRequest.onBeforeSendHeaders.addListener(function(details) {
-    var url = details.url;
-    if (url && details.requestHeaders) {
-        var matches = URLreg.exec(url);
-        if (matches[0]) {
-            var host = [matches[4], matches[5]].filter(function(v) {
-                return v;
-            }).join(':');
-
-            if ((host in setting.uaDomains) && setting.uaDomains[host].userAgent) {
-                details.requestHeaders.forEach(function(v) {
-                    if (v.name === 'User-Agent') {
-                        v.value = setting.uaDomains[host].userAgent;
-                    }
-                });
-            }
-        }
-
-    }
-    return {
-        requestHeaders: details.requestHeaders
-    };
-}, {
-    urls: ['<all_urls>']
-}, ['requestHeaders', 'blocking']);
-
-
-
-//message接收控制
-chrome.runtime.onMessage.addListener(function(obj, sender, callback) {
-    // console.log(obj);
-    switch (obj.action) {
-        case 'checkInjectDomain':
-            //check url
-            checkInjectDomain(obj.url, callback);
-            break;
-        case 'document_start':
-            //inject contents script
-            callback(obj);
-            break;
-        case 'userAgent':
-            //设置userAgent
-
-            callback(sessionStorage['User-Agent'] ? sessionStorage['User-Agent'] : '');
-            break;
-
-        case 'enableContentScriptRule':
-            //contentscript rule enable
-            setting.contentScripts = setting.contentScripts ? setting.contentScripts : [];
-            if (obj.data && obj.data.index && !~setting.contentScripts.indexOf(obj.data.index | 0)) {
-                setting.contentScripts.push(obj.data.index | 0);
-            }
-            break;
-        case 'unableContentScriptRule':
-            setting.contentScripts = setting.contentScripts ? setting.contentScripts : [];
-            setting.contentScripts.splice(setting.contentScripts.indexOf(obj.data.index | 0), 1);
-            break;
-        case 'enableMapRule':
-            setting.maps = setting.maps ? setting.maps : [];
-            if (obj.data && obj.data.index && !~setting.maps.indexOf(obj.data.index | 0)) {
-                setting.maps.push(obj.data.index | 0);
-            }
-            break;
-        case 'unableMapRule':
-            setting.maps = setting.maps ? setting.maps : [];
-            setting.maps.splice(setting.maps.indexOf(obj.data.index | 0), 1);
-            break;
-    }
-});
-
-//设置run_at content Script
-function checkInjectDomain(url, callback) {
-    var csId = setting.contentScripts || [];
-
-    if (csId.length && typeof callback === 'function') {
-        var contentScripts = ruleList.contentScripts;
-        for (var i = 0, len = csId.length; i < len; i++) {
-            var cs = contentScripts[csId[i]];
-            if (cs && cs.match && cs.urls.length) {
-                try {
-                    var reg = new RegExp(cs.match, 'gi');
-                    if (reg.test(url)) {
-                        //清理localstorage
-                        //1、请求urls
-                        //2、设置localstorage
-                        //3、reload URL
-                        return callback(cs);
-                    }
-                } catch (e) {}
-            }
-        }
-    }
-    callback(false);
-}
-
-
-//监控更新
-chrome.runtime.onInstalled.addListener(function(details) {
-
-    if (details.reason === 'install') {
-        setting.version = chrome.runtime.getManifest().version;
-        chrome.tabs.create({
-            url: 'options.html#about'
-        });
-    } else if (details.reason === 'update') {
-
-        setting.version = chrome.runtime.getManifest().version;
-        //取消升级打开窗口
-        chrome.tabs.create({
-            url: 'options.html#about'
-        });
-    }
-
-});
-
-function setIconText(text) {
-    if (text === undefined) {
-        text = '';
-    }
-    // console.log(text);
-    chrome.browserAction.setBadgeText({
-        text: text
-    });
-}
-//添加后台监控，测知当前tab是否使用ua！
-chrome.tabs.onSelectionChanged.addListener(function(tabId) {
-    chrome.tabs.get(tabId, function(tab) {
-        var matches = URLreg.exec(tab.url);
-        if (matches[0]) {
-            var host = [matches[4], matches[5]].filter(function(v) {
-                return v;
-            }).join(':');
-            if ((host in setting.uaDomains) && setting.uaDomains[host].vendor) {
-                return setIconText(setting.uaDomains[host].vendor);
-            }
-        }
-        setIconText('');
-
-    });
-});
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-    if (changeInfo.status === 'complete') {
-        chrome.tabs.getSelected(null, function(selectedTab) {
-            if (selectedTab.id == tab.id) {
-                var matches = URLreg.exec(tab.url);
-                if (matches[0]) {
-                    var host = [matches[4], matches[5]].filter(function(v) {
-                        return v;
-                    }).join(':');
-                    if ((host in setting.uaDomains) && setting.uaDomains[host].vendor) {
-                        return setIconText(setting.uaDomains[host].vendor);
-                    }
-                }
-            }
-            setIconText('');
-        });
-    }
-});
-
 
 
 //购物频道
@@ -262,7 +19,6 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 
     function getHtml() {
         lock = true;
-
         $.get('http://guangdiu.com/m/loaddata.php?v=' + (+new Date()) + '&p=1', function(html) {
             lock = false;
             if (!html) {
@@ -279,7 +35,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
                 }
                 id = id[1];
                 count += 1;
-                var title = $.trim($t.find('a.title').text())
+                var title = $.trim($t.find('a.title').text());
                 var img = $t.find('.thumbnail img').attr('src');
                 var abstract = $.trim($t.find('.abstract').text());
                 var mallname = $.trim($t.find('.mallname').text())
@@ -309,6 +65,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
         // console.log(count);
         if (count === 0) {
             var result = [];
+            console.log(data);
             for (var id in data) {
                 var d = data[id];
                 if (d.title.indexOf('京东') !== -1) {
