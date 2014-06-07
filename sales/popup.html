@@ -3,38 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <title>买便宜！</title>
-    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <!-- <link rel="stylesheet" href="css/bootstrap.min.css" /> -->
+    <link rel="stylesheet" type="text/css" href="css/bootmetro.min.css">
+    <link rel="stylesheet" type="text/css" href="css/bootmetro-responsive.min.css">
+    <link rel="stylesheet" type="text/css" href="css/bootmetro-icons.min.css">
+    <link rel="stylesheet" type="text/css" href="css/bootmetro-ui-light.min.css">
     <link rel="stylesheet" href="css/popup.css">
     <script src="js/jquery.js"></script>
     <script src="js/popup.js"></script>
 </head>
 <body>
-    <div class="container">
-        <div class="topbar clearfix">
-            <div class="rt icons">
-                <a title="选项" href="options.html" target="_blank" class="col-md-6 fl option "><span class="glyphicon glyphicon-cog"></span></a>
-                <a title="关闭" href="###" id="J-close" class="col-md-6 fl"><span class="glyphicon glyphicon-remove"></span></a>
-            </div>
-        </div>
+<div id="J-topbar" class="topbar clearfix ">
+    <div class="rt icons row">
+        <a title="选项" href="options.html" target="_blank" class="fl option "><span class="icon-cog-2"></span></a>
+        <a title="关闭" href="###" id="J-close" class="fl"><span class="icon-cross-3"></span></a>
+    </div>
+    <div class="box">
+        <ul class="nav nav-pills">
+             <li class="active">最新折扣</li>
+             <li>定制折扣</li>
+        </ul>
+    </div>
+
+</div>
+
+    <div id="J-all" class="container">
         <div class="content" id="J-content">
-            <div class="item">
-                <h4>FLYCO 飞科 FS619 往复式三刀头电动充电剃须刀（黑色）79元包邮</h4>
-                <div class="thumbnail">
-                    <img src="http://img14.360buyimg.com/n1/g14/M0A/1A/08/rBEhVlMsGZsIAAAAAAHD8T34uIAAAKn1QBavRUAAcQJ442.jpg" alt="">
-                </div>
-                <div class="info">
-                    <p class="desc">adidas 阿迪达斯 ON-PITCH UCL系列 G82967 欧冠决赛足球，采用优质的素材制成，具...         </p>
-                    <p class="footer"><a href="#" class="mallname">天猫</a><span class="rt">5分钟前从 惠惠网 同步</span></p>
-                    <div class="links row">
-                        <a href="#" class="col-md-6 fl btn buy btn-success">立即购买</a>
-                        <a href="#" class="col-md-6 fl btn more btn-success">查看详情</a>
-                    </div>
-                </div>
-            </div>
         </div>
-        <div id="J-loadmore" class="loadmore clearfix">
-            <a class="btn btn-success">加载更多30条...</a>
+        <div id="J-loadmore" class="loadmore clearfix" style="diplay:none;">
+            <button class="btn btn-success">加载更多30条...</button>
+        </div>
+        <div id="J-loading" class="loading">
+            <div class="loadingicon progress progress-indeterminate">
+                <div class="win-ring small"></div>
+            </div>
+            <span class="loadingmoreword">加载中，请稍候...</span>
         </div>
     </div>
+<script id="J-template" style="display:none" type="text/template">
+    <div class="item">
+        <h4><%= title %></h4>
+        <div class="thumbnail">
+            <img src="<%= img %>" alt="<%= title %>">
+        </div>
+        <div class="info">
+            <p class="desc clearfix"><%= detail %></p>
+            <div class="links row">
+                <p class="footer col-md-9 fl"><span class="mallname"><%= mallname %></span><span class="source-box"><%=time%>前从<span class="source"><%= source %></span>同步</span></p>
+                <button data-link="<%= url %>" class="col-md-3 fl btn buy btn-success">立即购买</button>
+                <!--a href="<%= url %>" class="col-md-6 fl btn more btn-success">查看详情</a-->
+            </div>
+        </div>
+    </div>
+</script>
 </body>
 </html>
