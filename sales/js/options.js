@@ -198,7 +198,7 @@ $(function() {
             return;
         }
         var $t = $(this);
-        $t .button('loading');
+        $t.button('loading');
         $.post('http://zhufu.sinaapp.com/api/mail.php', {
             content: encodeURIComponent($('#J-mybug').val()),
             email: encodeURIComponent($('#J-email').val())
@@ -208,6 +208,9 @@ $(function() {
             alert('发送成功，谢谢您的反馈~');
         });
     });
+
+
+
 });
 
 function insertKeyword(kw) {
