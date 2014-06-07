@@ -2,7 +2,7 @@ var API = {
     list: 'http://zhufu.sinaapp.com/api/getdata.php?page=',
     maxid: 'http://zhufu.sinapp.com/api/getmaxid.php'
 };
-var emptyFn = function(){};
+var emptyFn = function() {};
 var FIRST = true;
 $(function() {
 
@@ -21,21 +21,42 @@ $(function() {
         window.close();
     });
 
-    $.getJSON(API.list + PAGE).done(append);
-
+    try {
+        var data = sessionStorage.newData;
+        data = JSON.parse(data);
+        var now = +new Date();
+        if (now < data.expire) {
+            append(data, 'from cache');
+        }
+    } catch (e) {
+        $.getJSON(API.list + PAGE).done(append);
+    }
+    $('#J-refresh').click(function(){
+        refresh();
+        return false;
+    });
+    function refresh(){
+        PAGE = 1;
+        $content.empty();
+        $loadmore.hide();
+        $loading.show();
+        $.getJSON(API.list + PAGE).done(append);
+    }
     $content.delegate('button.buy', 'click', function() {
         chrome.tabs.create({
             url: $(this).data('link')
         });
     });
 
-    function append(json) {
+    function append(json, source) {
         $loadmore.show();
         $loading.hide();
+
         if (json.errno === 0) {
+            var now = +new Date();
             PAGE++;
             var html = '';
-            var now = +new Date();
+            // console.log(json.data);
             json.data.forEach(function(v) {
                 v.detail = v.detail.slice(0, 80);
                 html += TPL(Template, v);
@@ -54,6 +75,12 @@ $(function() {
                 chrome.browserAction.setTitle({
                     title: '里面条目您都看过了，等有更新了我立马儿通知您！'
                 });
+            }
+            if (source !== 'from cache') {
+                try {
+                    json.expire = now + 60 * 60 * 2000; //两分钟过期
+                    sessionStorage.newData = JSON.stringify(json);
+                } catch (e) {}
             }
         }
     }

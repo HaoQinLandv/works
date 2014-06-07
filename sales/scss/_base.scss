@@ -1,0 +1,8 @@
+// vendor prefixes support
+$experimental-support-for-mozilla: false !default;
+$experimental-support-for-webkit: true !default;
+$support-for-original-webkit-gradients: true !default;
+$experimental-support-for-opera: false !default;
+$experimental-support-for-microsoft: false !default;
+$experimental-support-for-khtml: false !default;
+@import "compass/css3";

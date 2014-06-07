@@ -1,7 +1,41 @@
 var ls = window.localStorage;
+var ss = window.sessionStorage;
+var ID = (+new Date());
+var MAX_NOTIFY = 6;
+//从localstorage读取设置
+var settings = ls.settings ? ls.settings : '{}';
+//关键词
+var keywords = ls.keywords ? ls.keywords : '[]';
+//静默时间
+var quietTimer = ls.quietTimer ? ls.quietTimer : '';
+quietTimer = quietTimer.split('-');
+if (quietTimer.length !== 2) {
+    quietTimer = false;
+} else if (quietTimer[0] >= quietTimer[1]) {
+    quietTimer = false;
+}
+
+try {
+    settings = JSON.parse(settings);
+} catch (e) {
+    settings = {};
+    ls.settings = '{}';
+}
+try {
+    keywords = JSON.parse(keywords);
+} catch (e) {
+    keywords = [];
+    ls.keywords = '[]';
+}
+settings = $.extend({
+    "openKeyword": true,
+    "openMusic": true,
+    "beQuiet": true,
+    "openNotice": true
+}, settings);
+
 var emptyFn = function() {};
 var feedTimer, noticeTimer;
-var Keywords = [];
 var feedInterval = 113000;
 var noticeInterval = 113000;
 
@@ -61,67 +95,142 @@ chrome.runtime.onMessage.addListener(function(obj, sender, callback) {
                 feedTimer = setInterval(checkNewFeed, feedInterval);
             }
             break;
-        case 'startNotice':
-            if (!noticeTimer) {
-                noticeTimer = setInterval(checkNotice, noticeInterval);
+        case 'updateQuietTimer':
+            quietTimer = ls.quietTimer ? ls.quietTimer : '';
+            quietTimer = quietTimer.split('-');
+            if (quietTimer.length !== 2) {
+                quietTimer = false;
+            } else if (quietTimer[0] >= quietTimer[1]) {
+                quietTimer = false;
             }
             break;
-        case 'updateKeywords':
-            //更新查询关键词
-            if (obj.data) {
-                var kws;
-                if (Array.isArray(obj.data)) {
-                    kws = JSON.stringify(obj.data);
-                    Keywords = obj.data;
-                    ls.keywords = kws;
-                } else if (typeof obj.data === 'string') {
-                    try {
-                        kws = JSON.parse(obj.data);
-                        if (Array.isArray(kws)) {
-                            Keywords = kws;
-                            ls.keywords = obj.data;
-                        }
-                    } catch (e) {}
-                }
+        case 'startNotice':
+            if (!noticeTimer) {
+                noticeTimer = setInterval(checkKeyWordNotice, noticeInterval);
             }
+            break;
+        case 'updateSwitch':
+            try {
+                settings = JSON.parse(ls.settings);
+            } catch (e) {}
+            break;
+        case 'updateKeyword':
+            try {
+                keywords = JSON.parse(ls.keywords);
+            } catch (e) {}
+            break;
+
     }
 });
 
-var notificationData = {};
 
-function checkNotice() {
-    if (Keywords.length === 0) {
+noticeTimer = setInterval(checkKeyWordNotice, noticeInterval);
+
+function checkKeyWordNotice() {
+    if (keywords.length === 0) {
         return;
     }
-    notificationData = {};
-    $.getJSON('http://zhufu.sinaapp.com/api/getdata.php?v=' + (+new Date()) + '&page=1', function(json) {
+    var maxnotifyid = ls.maxnotifyid;
+    if (!maxnotifyid) {
+        maxnotifyid = 0;
+    }
+    $.getJSON('http://zhufu.sinaapp.com/api/getdata.php?v=' + (+new Date()) + '&page=1&maxnotifyid=' + maxnotifyid, function(json) {
+        console.log(json);
         if (json.errno === 0) {
             var kw;
+            ls.maxnotifyid = json.maxid;
+            var play = false;
+            var notifyCount = 0;
             json.data.forEach(function(v) {
+                var id, opt;
+                //订阅关键字,保证最多弹MAX_NOTIFY个
+                if (settings.openKeyword && notifyCount <= MAX_NOTIFY) {
+                    kw = searchKeywords(v.title);
+                    if (kw) {
+                        v.keyword = kw;
+                        opt = {
+                            type: 'basic',
+                            title: '找到【' + kw + '】的折扣信息',
+                            message: v.title,
+                            iconUrl: v.img,
+                            buttons: [{
+                                title: '立即去抢购 >>',
+                                iconUrl: '../icon64.png'
+                            }]
+                        };
+                        id = 'kw' + v.id;
 
-                kw = searchKeywords(v.title);
-                if (kw) {
-                    v.keyword = kw;
-                    notificationData[v.id] = v;
-                    var opt = {
-                        type: 'basic',
-                        title: '找到【' + kw + '】的便宜信息',
-                        message: v.title,
-                        iconUrl: v.img
-                    };
-
-                    chrome.notifications.create('' + v.id, opt, emptyFn);
+                        chrome.notifications.create(id, opt, function() {
+                            //存入sessionStorage
+                            ss[id] = JSON.stringify(v);
+                            notifyCount++;
+                        });
+                        play = true;
+                    }
+                }
+                if (settings.openNotice && notifyCount <= MAX_NOTIFY) {
+                    var hour = new Date().getHours();
+                    if (!quietTimer ||
+                        !Array.isArray(quietTimer) ||
+                        quietTimer.length !== 2 ||
+                        quietTimer[0] >= quietTimer[1] ||
+                        (quietTimer[0] < quietTimer[1] && (hour < quietTimer[0] || hour >= quietTimer[1]))
+                    ) {
+                        opt = {
+                            type: 'basic',
+                            title: v.title,
+                            message: v.detail.slice(0, 30) + '..',
+                            iconUrl: v.img,
+                            buttons: [{
+                                title: '立即去抢购 >>',
+                                iconUrl: '../icon64.png'
+                            }]
+                        };
+                        id = 'item' + v.id;
+                        chrome.notifications.create(id, opt, function() {
+                            //存入sessionStorage
+                            ss[id] = JSON.stringify(v);
+                            notifyCount++;
+                        });
+                        play = true;
+                    }
                 }
             });
+            if (play) {
+                playNotificationSound();
+            }
         }
     });
 }
 
 chrome.notifications.onClicked.addListener(function(id) {
-    if (notificationData[id]) {
-        chrome.tabs.create({
-            url: notificationData[id].url
-        });
+    if (ss[id]) {
+        try {
+            var obj = JSON.parse(ss[id]);
+            if (obj.url) {
+                chrome.tabs.create({
+                    url: obj.url
+                });
+            }
+
+        } catch (e) {
+            ss.removeItem(id);
+        }
+    }
+});
+chrome.notifications.onButtonClicked.addListener(function(id) {
+    if (ss[id]) {
+        try {
+            var obj = JSON.parse(ss[id]);
+            if (obj.url) {
+                chrome.tabs.create({
+                    url: obj.url
+                });
+            }
+
+        } catch (e) {
+            ss.removeItem(id);
+        }
     }
 });
 /**
@@ -130,7 +239,7 @@ chrome.notifications.onClicked.addListener(function(id) {
  * @return {string}   返回查询到的关键字
  */
 function searchKeywords(q) {
-    var kw = Keywords;
+    var kw = keywords;
     if (kw.length === 0) {
         return false;
     }
@@ -141,4 +250,15 @@ function searchKeywords(q) {
         }
     }
     return false;
+}
+
+function playNotificationSound() {
+
+    try {
+        var b = new Audio('sound/notify.mp3');
+
+        b.play();
+    } catch (e) {
+
+    }
 }
