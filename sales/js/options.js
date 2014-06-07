@@ -91,13 +91,7 @@ $(function() {
     }
 
 
-    $.getJSON('http://zhufu.sinaapp.com/api/gethot.php').done(function(json) {
-        var html = '';
-        json.forEach(function(v) {
-            html += '<span title="点击添加到订阅" class="J-label label ' + getRandomLabelClass() + '">' + v + '</span>';
-        });
-        $('#J-hot').after(html);
-    });
+
     $('#J-hot-keyword').delegate('span.J-label', 'click', function() {
         var $t = $(this);
         var kw = $t.html();
@@ -114,6 +108,9 @@ $(function() {
             }, emptyFn);
         }
         $t.remove();
+        if ($('#J-kw-con').children().length === 0) {
+            $('#J-kw-con').html('<p>竟然还是空的，添加订阅关键字会帮你监控你想要的优惠信息哦</p>');
+        }
     });
 
 
@@ -193,19 +190,43 @@ $(function() {
             }
         });
     });
+    getHot();
+    $('#J-send-mail').click(function() {
+        if ($('#J-mybug').val().length < 10) {
+            alert('多写两句再发送吧~');
+            $('#J-mybug').focus();
+            return;
+        }
+        var $t = $(this);
+        $t .button('loading');
+        $.post('http://zhufu.sinaapp.com/api/mail.php', {
+            content: encodeURIComponent($('#J-mybug').val()),
+            email: encodeURIComponent($('#J-email').val())
+        }).done(function() {
+            $t.button('reset');
+            $('#J-mybug').val('');
+            alert('发送成功，谢谢您的反馈~');
+        });
+    });
 });
 
 function insertKeyword(kw) {
     if (keywords.indexOf(kw) !== -1) {
+        // console.log(keywords, keywords.indexOf(kw));
         return;
     }
+    // console.log(keywords);
     keywords.push(kw);
     ls.keywords = JSON.stringify(keywords);
     chrome.runtime.sendMessage({
         action: 'updateKeyword'
     }, emptyFn);
+    if ($('#J-kw-con span').length) {
 
-    $('<span class="label ' + getRandomLabelClass() + '">' + kw + '<span class="J-close icon-close"></span></span>').hide().insertBefore($('#J-kw-con span').eq(0)).show('fast');
+        $('<span class="label ' + getRandomLabelClass() + '">' + kw + '<span class="J-close icon-close"></span></span>').hide().insertBefore($('#J-kw-con span').eq(0)).show('fast');
+    } else {
+        $('#J-kw-con').empty().html('<span class="label ' + getRandomLabelClass() + '">' + kw + '<span class="J-close icon-close"></span></span>');
+    }
 }
 
 function getRandomLabelClass() {
@@ -229,4 +250,30 @@ function verson_compare(version1, version2) {
         }
     }
     return 0;
+}
+
+function getHot() {
+    var kws = sessionStorage.hotKeywords;
+    try {
+        kws = JSON.parse(kws);
+    } catch (e) {}
+    // console.log(kws);
+    if (!kws) {
+        $.getJSON('http://zhufu.sinaapp.com/api/gethot.php').done(function(json) {
+            cb(json);
+            try {
+                sessionStorage.hotKeywords = JSON.stringify(json);
+            } catch (e) {}
+        });
+    } else if (Array.isArray(kws) && kws.length) {
+        cb(kws);
+    }
+
+    function cb(json) {
+        var html = '';
+        json.forEach(function(v) {
+            html += '<span title="点击添加到订阅" class="J-label label ' + getRandomLabelClass() + '">' + v + '</span>';
+        });
+        $('#J-hot').after(html);
+    }
 }

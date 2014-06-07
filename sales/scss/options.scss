@@ -25,12 +25,12 @@ a{
     margin: 0 auto;
 
     .setting-box{
-        margin-bottom: 20px;
+        margin-bottom: 60px;
     }
     h1.title{
         font-weight: bold;
         font-size: 24px;
-        margin-bottom: 10px;
+        margin-bottom: 20px;
         // color:#5bb75b;
         i{
             margin-left: 10px;
@@ -61,7 +61,7 @@ a{
         position: relative;
         margin: 15px 0;
         padding: 39px 19px 14px;
-
+        min-height:30px;
     }
     .kw-title{
         position: absolute;

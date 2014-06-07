@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>买便宜！设置</title>
+    <title>折扣商品实时推送 设置</title>
     <link rel="stylesheet" type="text/css" href="css/bootmetro.min.css">
     <link rel="stylesheet" type="text/css" href="css/bootmetro-responsive.min.css">
     <link rel="stylesheet" type="text/css" href="css/bootmetro-icons.min.css">
@@ -24,12 +24,11 @@
             <a class="brand" href="#">折扣商品实时推送</a>
             <div class="nav-collapse collapse navbar-responsive-collapse">
                <ul class="nav">
-                  <li class="active"><a href="#">设置</a></li>
-                  <li><a href="#">查看订阅消息</a></li>
+                  <li class="active"><a href="options.html">设置</a></li>
+                  <li><a href="query.html">查看订阅消息</a></li>
                </ul>
                <ul class="nav pull-right">
                   <li><a href="###" data-toggle="modal" data-target="#J-about">关于本插件</a></li>
-
                </ul>
             </div>
          </div>
@@ -113,12 +112,12 @@
   </div>
   <div class="modal-body">
      <ul class="nav nav-tabs" id="J-model-tab">
-         <li class="active"><a href="#J-version">当前版本</a></li>
+         <li class="active"><a href="#J-ver-box">当前版本</a></li>
          <li><a href="#J-bug">报告问题</a></li>
        </ul>
 
        <div class="tab-content">
-         <div class="tab-pane active">
+         <div id="J-ver-box" class="tab-pane active">
              <p id="J-version"></p>
              <div>
                 <button class="btn btn-success" id="J-update-btn" data-loading-text="检查中...">检查更新</button>
@@ -141,7 +140,7 @@
                   </div>
                   <div class="control-group">
                      <div class="controls">
-                        <button type="submit" class="btn">发送</button>
+                        <button id="J-send-mail" type="submit" class="btn" data-loading-text="发送中...">发送</button>
                      </div>
                   </div>
                </div>

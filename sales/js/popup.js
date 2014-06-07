@@ -20,22 +20,13 @@ $(function() {
     $('#J-close').click(function() {
         window.close();
     });
-
-    try {
-        var data = sessionStorage.newData;
-        data = JSON.parse(data);
-        var now = +new Date();
-        if (now < data.expire) {
-            append(data, 'from cache');
-        }
-    } catch (e) {
-        $.getJSON(API.list + PAGE).done(append);
-    }
-    $('#J-refresh').click(function(){
+    $('#J-refresh').click(function() {
         refresh();
         return false;
     });
-    function refresh(){
+
+
+    function refresh() {
         PAGE = 1;
         $content.empty();
         $loadmore.hide();
@@ -49,8 +40,6 @@ $(function() {
     });
 
     function append(json, source) {
-        $loadmore.show();
-        $loading.hide();
 
         if (json.errno === 0) {
             var now = +new Date();
@@ -83,6 +72,21 @@ $(function() {
                 } catch (e) {}
             }
         }
+        $loadmore.show();
+        $loading.hide();
+    }
+
+    try {
+        var data = sessionStorage.newData;
+        data = JSON.parse(data);
+        var now = +new Date();
+        if (now < data.expire) {
+            append(data, 'from cache');
+        }
+    } catch (e) {
+        setTimeout(function() {
+            $.getJSON(API.list + PAGE).done(append);
+        }, 50);
     }
 });
 

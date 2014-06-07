@@ -135,7 +135,7 @@ function checkKeyWordNotice() {
         maxnotifyid = 0;
     }
     $.getJSON('http://zhufu.sinaapp.com/api/getdata.php?v=' + (+new Date()) + '&page=1&maxnotifyid=' + maxnotifyid, function(json) {
-        console.log(json);
+        // console.log(json);
         if (json.errno === 0) {
             var kw;
             ls.maxnotifyid = json.maxid;
@@ -144,8 +144,9 @@ function checkKeyWordNotice() {
             json.data.forEach(function(v) {
                 var id, opt;
                 //订阅关键字,保证最多弹MAX_NOTIFY个
-                if (settings.openKeyword && notifyCount <= MAX_NOTIFY) {
+                if (keywords.length && settings.openKeyword && notifyCount <= MAX_NOTIFY) {
                     kw = searchKeywords(v.title);
+                    // console.log(kw);
                     if (kw) {
                         v.keyword = kw;
                         opt = {
@@ -170,7 +171,8 @@ function checkKeyWordNotice() {
                 }
                 if (settings.openNotice && notifyCount <= MAX_NOTIFY) {
                     var hour = new Date().getHours();
-                    if (!quietTimer ||
+                    if (!settings.beQuiet ||
+                        !quietTimer ||
                         !Array.isArray(quietTimer) ||
                         quietTimer.length !== 2 ||
                         quietTimer[0] >= quietTimer[1] ||
@@ -253,12 +255,8 @@ function searchKeywords(q) {
 }
 
 function playNotificationSound() {
-
     try {
-        var b = new Audio('sound/notify.mp3');
-
-        b.play();
-    } catch (e) {
-
-    }
+        var notifyAudio = new Audio('sound/notify.mp3');
+        notifyAudio.play();
+    } catch (e) {}
 }
