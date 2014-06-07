@@ -255,6 +255,9 @@ function searchKeywords(q) {
 }
 
 function playNotificationSound() {
+    if (settings.beQuiet) {
+        return;
+    }
     try {
         var notifyAudio = new Audio('sound/notify.mp3');
         notifyAudio.play();
