@@ -114,7 +114,7 @@ $(function() {
     }).each(function(i, v) {
         new Switchery(v);
     });
-    $('#J-max-notify').val(localStorage.MAX_NOTIFY ? localStorage.MAX_NOTIFY : 6).change(function() {
+    $('#J-max-notify').val(localStorage.MAX_NOTIFY ? localStorage.MAX_NOTIFY : 3).change(function() {
         localStorage.MAX_NOTIFY = $(this).val();
     });
     //关键字事件--------------------------
@@ -210,10 +210,7 @@ $(function() {
 
                 $t.button('reset');
             },
-            timeout: function() {
-                $('#J-update-info').html('检查超时，请稍后再试').addClass('error');
-                $t.button('reset');
-            },
+            timeout: 3000,
             error: function() {
                 $('#J-update-info').html('检查失败，请稍后再试').addClass('error');
                 $t.button('reset');
