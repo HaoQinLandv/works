@@ -147,7 +147,7 @@ $(function() {
         var $t = $(this).parent();
         var kw = $.trim($t.text());
         if (keywords.indexOf(kw) !== -1) {
-            keywords.splice(keywords.indexOf - 1, 1);
+            keywords.splice(keywords.indexOf(kw), 1);
             ls.keywords = JSON.stringify(keywords);
             chrome.runtime.sendMessage({
                 action: 'updateKeyword'

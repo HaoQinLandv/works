@@ -276,6 +276,10 @@ chrome.notifications.onButtonClicked.addListener(function(id) {
         } catch (e) {
             ss.removeItem(id);
         }
+    } else if (id.indexOf('update_notify') === 0) {
+        chrome.tabs.create({
+            url: 'options.html'
+        });
     }
 });
 /**
@@ -306,3 +310,25 @@ function playNotificationSound() {
         notifyAudio.play();
     } catch (e) {}
 }
+
+
+//监控更新
+chrome.runtime.onInstalled.addListener(function(details) {
+    var version = chrome.runtime.getManifest().version;
+    var opt = {
+        type: 'basic',
+        title: '折扣商品实时推送更新了！',
+        message: '当前版本：v' + version,
+        iconUrl: 'icon128.png'
+    };
+    if (details.reason === 'install') {
+        opt.title = '您已经安装成功【折扣商品实时推送】';
+        opt.buttons = [{
+            title: '设置 >>',
+            iconUrl: 'img/options.png'
+        }];
+    } else if (details.reason === 'update') {
+        version = chrome.runtime.getManifest().version;
+    }
+    chrome.notifications.create('update_notify' + (+new Date()), opt, function() {});
+});
