@@ -109,7 +109,6 @@ chrome.runtime.onMessage.addListener(function(obj, sender, callback) {
             } else {
                 quietTimer = [quietTimer[0] | 0, quietTimer[1] | 0];
             }
-            console.log(quietTimer, 'be queit time');
             break;
         case 'startNotice':
             if (!noticeTimer) {
@@ -151,21 +150,26 @@ function checkKeyWordNotice() {
     var MAX_NOTIFY = ls.MAX_NOTIFY;
     if (!ls.MAX_NOTIFY) {
         //默认弹窗数量为6
-        MAX_NOTIFY = 6;
+        MAX_NOTIFY = 3;
+    } else if (ls.MAX_NOTIFY === 'ALL') {
+        MAX_NOTIFY = 30;
+    } else {
+        MAX_NOTIFY |= 0;
+        if (MAX_NOTIFY === 0) {
+            MAX_NOTIFY = 3;
+        }
     }
-    console.log(MAX_NOTIFY);
     $.getJSON('http://zhufu.sinaapp.com/api/getdata.php?v=' + (+new Date()) + '&page=1&maxnotifyid=' + maxnotifyid, function(json) {
         // console.log(json);
         if (json.errno === 0) {
             var kw;
             ls.maxnotifyid = json.maxid;
             var play = false;
-            var notifyCount = 0;
-            console.log(MAX_NOTIFY, json.data.length);
+            var notifyCount = 1;
             json.data.forEach(function(v) {
                 var id, opt;
                 //订阅关键字,保证最多弹MAX_NOTIFY个
-                if (keywords.length && settings.openKeyword && (notifyCount <= MAX_NOTIFY || MAX_NOTIFY === 'ALL')) {
+                if (keywords.length && settings.openKeyword && notifyCount <= MAX_NOTIFY) {
                     kw = searchKeywords(v.title);
                     // console.log(kw);
                     if (kw) {
@@ -185,16 +189,16 @@ function checkKeyWordNotice() {
                         chrome.notifications.create(id, opt, function() {
                             //存入sessionStorage
                             ss[id] = JSON.stringify(v);
-                            notifyCount++;
                             if (!play) {
                                 playNotificationSound();
                             }
                             play = true;
                         });
+                        notifyCount++;
                     }
                 }
 
-                if (settings.openNotice && (notifyCount <= MAX_NOTIFY || MAX_NOTIFY === 'ALL')) {
+                if (settings.openNotice && notifyCount <= MAX_NOTIFY) {
                     var hour = new Date().getHours();
                     hour = hour | 0;
                     var cb = function() {
@@ -209,15 +213,17 @@ function checkKeyWordNotice() {
                             }]
                         };
                         id = 'item' + v.id;
+
                         chrome.notifications.create(id, opt, function() {
                             //存入sessionStorage
                             ss[id] = JSON.stringify(v);
-                            notifyCount++;
+
                             if (!play) {
                                 playNotificationSound();
                             }
                             play = true;
                         });
+                        notifyCount++;
                     };
                     if (!settings.beQuiet) {
                         //如果没有设置安静时间

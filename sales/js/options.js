@@ -183,7 +183,7 @@ $(function() {
         var $t = $(this);
         $t.button('loading');
         $.ajax({
-            url: Manifest.update_url,
+            url: 'http://clients2.google.com/service/update2/crx?response=updatecheck&x=id%3Dfencnigkojiegaifcngopoenckcgbcoo%26uc',
             dataType: 'xml',
             success: function(xml) {
                 if (!xml) {
@@ -196,14 +196,16 @@ $(function() {
                     var v = verson_compare(xmlVersion, version);
                     if (v > 0 && $updateInfo.attr('codebase')) {
                         //有更新
-                        $('#J-update-info').html('发现最新版本：v' + xmlVersion + '，<a target="_blank" class="btn btn-info" href="' + $updateInfo.attr('codebase') + '">立即更新</a>').reomveClass('error');
+                        $('#J-update-info').html('发现最新版本：v' + xmlVersion + '，<a target="_blank" class="btn btn-info" href="https://chrome.google.com/webstore/detail/fencnigkojiegaifcngopoenckcgbcoo">立即更新</a>').removeClass('error');
                     } else if (v === 0) {
                         //已经是最新版
-                        $('#J-update-info').html('已经是最新版').reomveClass('error');
+                        $('#J-update-info').html('已经是最新版').removeClass('error');
                     } else {
                         //测试版？
-                        $('#J-update-info').html('额，难道是传说中的测试版？').reomveClass('error');
+                        $('#J-update-info').html('额，难道是传说中的测试版？').removeClass('error');
                     }
+                }else{
+                    $('#J-update-info').html('已经是最新版').removeClass('error');
                 }
 
                 $t.button('reset');
