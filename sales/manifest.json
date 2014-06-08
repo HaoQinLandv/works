@@ -1,14 +1,14 @@
 {
-   "minimum_chrome_version": "28.0.0",
-   "version": "0.3.0",
+   "minimum_chrome_version": "20.0.0",
+   "version": "1.0.2",
    "manifest_version": 2,
-   "name": "折扣商品实时推送",
+   "name": "折扣优惠实时推送：白菜党必备什么值得买神器",
+   "description": "收集什么值得买、逛丢、惠惠网、天猫、京东、易迅、苏宁易购、亚马逊、一号店等各大购物网站的实时折扣优惠信息，可以订阅关键词，白菜党必备神器！",
    "options_page": "options.html",
    "icons": {
       "128": "icon128.png",
       "64": "icon64.png"
    },
-   "update_url": "http://fe.baidu.com/doc/kuang/tool/box-chrome/updates.xml",
    "permissions": ["tabs", "https://*/*", "http://*/*", "notifications"],
    "background": {
       "persistent": true,

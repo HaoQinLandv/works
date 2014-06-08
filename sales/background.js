@@ -165,8 +165,11 @@ function checkKeyWordNotice() {
                             //存入sessionStorage
                             ss[id] = JSON.stringify(v);
                             notifyCount++;
+                            if (!play) {
+                                playNotificationSound();
+                            }
+                            play = true;
                         });
-                        play = true;
                     }
                 }
                 if (settings.openNotice && notifyCount <= MAX_NOTIFY) {
@@ -193,14 +196,16 @@ function checkKeyWordNotice() {
                             //存入sessionStorage
                             ss[id] = JSON.stringify(v);
                             notifyCount++;
+                            if (!play) {
+                                playNotificationSound();
+                            }
+                            play = true;
                         });
-                        play = true;
+
                     }
                 }
             });
-            if (play) {
-                playNotificationSound();
-            }
+
         }
     });
 }
