@@ -153,6 +153,7 @@ function checkKeyWordNotice() {
         //默认弹窗数量为6
         MAX_NOTIFY = 6;
     }
+    console.log(MAX_NOTIFY);
     $.getJSON('http://zhufu.sinaapp.com/api/getdata.php?v=' + (+new Date()) + '&page=1&maxnotifyid=' + maxnotifyid, function(json) {
         // console.log(json);
         if (json.errno === 0) {
@@ -160,6 +161,7 @@ function checkKeyWordNotice() {
             ls.maxnotifyid = json.maxid;
             var play = false;
             var notifyCount = 0;
+            console.log(MAX_NOTIFY, json.data.length);
             json.data.forEach(function(v) {
                 var id, opt;
                 //订阅关键字,保证最多弹MAX_NOTIFY个
