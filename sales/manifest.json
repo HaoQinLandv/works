@@ -5,7 +5,6 @@
    "short_name": "折扣优惠实时推送",
    "name": "折扣优惠实时推送：白菜党必备什么值得买神器",
    "description": "收集什么值得买、逛丢、惠惠网、天猫、京东、易迅、苏宁易购、亚马逊、一号店等各大购物网站的实时折扣优惠信息，可以订阅关键词，白菜党必备神器！",
-   "update_url": "http://zhufu.sinaapp.com/api/update.xml",
    "options_page": "options.html",
    "icons": {
       "128": "icon128.png",

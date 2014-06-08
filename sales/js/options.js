@@ -209,7 +209,11 @@ $(function() {
         });
     });
 
-
+    $('#J-like').click(function(){
+        chrome.tabs.create({
+            url: $(this).data('link')
+        });
+    });
 
 });
 
