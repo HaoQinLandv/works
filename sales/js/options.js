@@ -53,25 +53,71 @@ $(function() {
         }, function() {});
     });
 
+    //绑定定时静默时间选择器事件
+    $('.J-timer-select').change(function() {
+        var $t = $(this);
+        var val = this.value;
+        var quietTimer = ls.quietTimer ? ls.quietTimer : '';
+        quietTimer = quietTimer.split('-');
+        quietTimer[$t.data('index') | 0] = val;
+        quietTimer = quietTimer.map(function(v) {
+            return v ? v : 0;
+        });
+        ls.quietTimer = quietTimer.join('-');
+        chrome.runtime.sendMessage({
+            action: 'updateQuietTimer'
+        }, emptyFn);
+    });
+    //设置开关
     for (var i in settings) {
         // console.log(i, settings[i]);
-        $('input[data-lsid="' + i + '"]').attr('checked', settings[i]);
+        $('input[data-lsid="' + i + '"]').attr('checked', !!settings[i]);
+        if (i === 'beQuiet') {
+            if (!!settings[i]) {
+                $('.J-timer-select').removeAttr('disabled');
+                var quietTimer = ls.quietTimer ? ls.quietTimer : '';
+                quietTimer = quietTimer.split('-');
+                if (quietTimer.length !== 2) {
+                    $('.J-timer-select').val(0);
+                    ls.removeItem('quietTimer');
+                } else if ((quietTimer[0] | 0) >= (quietTimer[1] | 0)) {
+                    $('.J-timer-select').val(0);
+                    ls.removeItem('quietTimer');
+                } else {
+                    $('#J-quiet-time1').val(quietTimer[0]).trigger('change');
+                    $('#J-quiet-time2').val(quietTimer[1]).trigger('change');
+                }
+            } else {
+                $('.J-timer-select').attr('disabled', 'disabled');
+            }
+        }
     }
+    //绑定开关事件
     $('.J-switch').change(function() {
         var st = settings;
         var $t = $(this);
         var lsid = $t.data('lsid');
         st[lsid] = !!this.checked;
-        if (lsid == 'beQuiet') {
-            $('.J-timer-select').attr('disabled', !this.checked);
+        if (lsid === 'beQuiet') {
+            if (this.checked) {
+                $('.J-timer-select').removeAttr('disabled');
+            } else {
+                $('.J-timer-select').attr('disabled', 'disabled');
+            }
         }
         ls.settings = JSON.stringify(st);
         chrome.runtime.sendMessage({
-            action: 'updateSwitch'
+            action: 'updateSwitch',
+            id: lsid,
+            value: this.checked
         }, emptyFn);
     }).each(function(i, v) {
         new Switchery(v);
     });
+    $('#J-max-notify').val(localStorage.MAX_NOTIFY ? localStorage.MAX_NOTIFY : 6).change(function() {
+        localStorage.MAX_NOTIFY = $(this).val();
+    });
+    //关键字事件--------------------------
     $('#J-keyword-submit').click(function() {
         keypress();
         return false;
@@ -113,7 +159,6 @@ $(function() {
         }
     });
 
-
     function keypress() {
         var kw = $.trim($('#J-keyword').val());
         if (kw === '') {
@@ -124,25 +169,8 @@ $(function() {
         }
         return false;
     }
-    var optHtml = '';
-    for (i = 0; i < 25; i++) {
-        optHtml += '<option value="' + i + '">' + i + ':00</option>';
-    }
-    $('.J-timer-select').html(optHtml).change(function() {
-        var $t = $(this);
-        var val = this.value;
-        var quietTimer = ls.quietTimer ? ls.quietTimer : '';
-        quietTimer = quietTimer.split('-');
-        quietTimer[$t.data('index') | 0] = val;
-        quietTimer = quietTimer.map(function(v) {
-            return v ? v : 0;
-        });
-        ls.quietTimer = quietTimer.join('-');
-        chrome.runtime.sendMessage({
-            action: 'updateQuietTimer'
-        }, emptyFn);
-    });
 
+    //关键字事件<<<<<<<<<<<<<<-------------
 
     $('#J-about .nav-tabs a').click(function(e) {
         e.preventDefault();
@@ -209,7 +237,7 @@ $(function() {
         });
     });
 
-    $('#J-like').click(function(){
+    $('#J-like').click(function() {
         chrome.tabs.create({
             url: $(this).data('link')
         });

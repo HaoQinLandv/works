@@ -1,7 +1,7 @@
 var ls = window.localStorage;
 var ss = window.sessionStorage;
 var ID = (+new Date());
-var MAX_NOTIFY = 6;
+// var MAX_NOTIFY = 6;
 //从localstorage读取设置
 var settings = ls.settings ? ls.settings : '{}';
 //关键词
@@ -11,8 +11,10 @@ var quietTimer = ls.quietTimer ? ls.quietTimer : '';
 quietTimer = quietTimer.split('-');
 if (quietTimer.length !== 2) {
     quietTimer = false;
-} else if (quietTimer[0] >= quietTimer[1]) {
+} else if ((quietTimer[0] | 0) >= (quietTimer[1] | 0)) {
     quietTimer = false;
+} else {
+    quietTimer = [quietTimer[0] | 0, quietTimer[1] | 0];
 }
 
 try {
@@ -28,10 +30,10 @@ try {
     ls.keywords = '[]';
 }
 settings = $.extend({
-    "openKeyword": true,
-    "openMusic": true,
-    "beQuiet": true,
-    "openNotice": true
+    openKeyword: true,
+    openMusic: true,
+    beQuiet: true,
+    openNotice: true
 }, settings);
 
 var emptyFn = function() {};
@@ -100,9 +102,14 @@ chrome.runtime.onMessage.addListener(function(obj, sender, callback) {
             quietTimer = quietTimer.split('-');
             if (quietTimer.length !== 2) {
                 quietTimer = false;
-            } else if (quietTimer[0] >= quietTimer[1]) {
+                ls.removeItem('quietTimer');
+            } else if ((quietTimer[0] | 0) >= (quietTimer[1] | 0)) {
                 quietTimer = false;
+                ls.removeItem('quietTimer');
+            } else {
+                quietTimer = [quietTimer[0] | 0, quietTimer[1] | 0];
             }
+            console.log(quietTimer, 'be queit time');
             break;
         case 'startNotice':
             if (!noticeTimer) {
@@ -112,6 +119,9 @@ chrome.runtime.onMessage.addListener(function(obj, sender, callback) {
         case 'updateSwitch':
             try {
                 settings = JSON.parse(ls.settings);
+                if (obj.id === 'beQuiet' && obj.value === true) {
+                    ls.removeItem('quietTimer');
+                }
             } catch (e) {}
             break;
         case 'updateKeyword':
@@ -130,9 +140,18 @@ function checkKeyWordNotice() {
     if (keywords.length === 0) {
         return;
     }
+    if (!settings.openNotice && (keywords.length === 0 || !settings.openKeyword)) {
+        //没有打开提醒，并且关键词也没打开
+        return;
+    }
     var maxnotifyid = ls.maxnotifyid;
     if (!maxnotifyid) {
         maxnotifyid = 0;
+    }
+    var MAX_NOTIFY = ls.MAX_NOTIFY;
+    if (!ls.MAX_NOTIFY) {
+        //默认弹窗数量为6
+        MAX_NOTIFY = 6;
     }
     $.getJSON('http://zhufu.sinaapp.com/api/getdata.php?v=' + (+new Date()) + '&page=1&maxnotifyid=' + maxnotifyid, function(json) {
         // console.log(json);
@@ -144,7 +163,7 @@ function checkKeyWordNotice() {
             json.data.forEach(function(v) {
                 var id, opt;
                 //订阅关键字,保证最多弹MAX_NOTIFY个
-                if (keywords.length && settings.openKeyword && notifyCount <= MAX_NOTIFY) {
+                if (keywords.length && settings.openKeyword && (notifyCount <= MAX_NOTIFY || MAX_NOTIFY === 'ALL')) {
                     kw = searchKeywords(v.title);
                     // console.log(kw);
                     if (kw) {
@@ -172,15 +191,11 @@ function checkKeyWordNotice() {
                         });
                     }
                 }
-                if (settings.openNotice && notifyCount <= MAX_NOTIFY) {
+
+                if (settings.openNotice && (notifyCount <= MAX_NOTIFY || MAX_NOTIFY === 'ALL')) {
                     var hour = new Date().getHours();
-                    if (!settings.beQuiet ||
-                        !quietTimer ||
-                        !Array.isArray(quietTimer) ||
-                        quietTimer.length !== 2 ||
-                        quietTimer[0] >= quietTimer[1] ||
-                        (quietTimer[0] < quietTimer[1] && (hour < quietTimer[0] || hour >= quietTimer[1]))
-                    ) {
+                    hour = hour | 0;
+                    var cb = function() {
                         opt = {
                             type: 'basic',
                             title: v.title,
@@ -201,8 +216,23 @@ function checkKeyWordNotice() {
                             }
                             play = true;
                         });
-
+                    };
+                    if (!settings.beQuiet) {
+                        //如果没有设置安静时间
+                        // console.log('没有设置安静时间');
+                        cb();
+                    } else if (quietTimer &&
+                        Array.isArray(quietTimer) &&
+                        quietTimer.length === 2 &&
+                        quietTimer[0] < quietTimer[1] &&
+                        (hour >= quietTimer[0] && hour < quietTimer[1])) {
+                        // console.log('在安静时间内');
+                    } else {
+                        // console.log('其他时间');
+                        cb();
                     }
+
+
                 }
             });
 
