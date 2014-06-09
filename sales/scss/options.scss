@@ -1,7 +1,11 @@
 @import "base";
+strong{
+    font-weight: bold;
+}
 .bold{
     font-weight: bold;
 }
+
 a{
     color:#5db95b;
     &:hover{
@@ -99,6 +103,7 @@ a{
         color:#5db95b;
         cursor: pointer;
     }
+
 }
 .input-append .add-on:last-child, .input-append .btn:last-child,
 .control-group.success input, .control-group.success select, .control-group.success textarea{

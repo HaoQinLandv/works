@@ -1,6 +1,7 @@
 var ls = window.localStorage;
 var ss = window.sessionStorage;
 var ID = (+new Date());
+var VERSION = chrome.runtime.getManifest().version;
 // var MAX_NOTIFY = 6;
 //从localstorage读取设置
 var settings = ls.settings ? ls.settings : '{}';
@@ -60,7 +61,7 @@ feedTimer = setInterval(checkNewFeed, feedInterval);
 
 function checkNewFeed() {
     var curmaxidloop = ls.maxCnDealId;
-    $.get('http://zhufu.sinaapp.com/api/newfeed.php?id=' + curmaxidloop, function(data) {
+    $.get('http://zhufu.sinaapp.com/api/newfeed.php?v=' + VERSION + '&id=' + curmaxidloop, function(data) {
         if (data > 99) {
             //不再更新
             clearInterval(feedTimer);
@@ -159,7 +160,7 @@ function checkKeyWordNotice() {
             MAX_NOTIFY = 3;
         }
     }
-    $.getJSON('http://zhufu.sinaapp.com/api/getdata.php?v=' + (+new Date()) + '&page=1&maxnotifyid=' + maxnotifyid, function(json) {
+    $.getJSON('http://zhufu.sinaapp.com/api/getdata.php?v=' + VERSION + '&t=' + (+new Date()) + '&page=1&maxnotifyid=' + maxnotifyid, function(json) {
         // console.log(json);
         if (json.errno === 0) {
             var kw;

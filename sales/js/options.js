@@ -2,7 +2,7 @@ var Labels = ['label-success', 'label-info', 'label-important', 'label-warning',
 var ls = window.localStorage;
 var settings = ls.settings ? ls.settings : '{}';
 var keywords = ls.keywords ? ls.keywords : '[]';
-
+var VERSION = chrome.runtime.getManifest().version;
 try {
     settings = JSON.parse(settings);
 } catch (e) {
@@ -176,8 +176,7 @@ $(function() {
         e.preventDefault();
         $(this).tab('show');
     });
-    var Manifest = chrome.runtime.getManifest();
-    var version = Manifest.version;
+    var version = VERSION;
     $('#J-version').html('<p>当前版本 V' + version + '</p>');
     $('#J-update-btn').click(function() {
         var $t = $(this);
@@ -230,8 +229,8 @@ $(function() {
         }
         var $t = $(this);
         $t.button('loading');
-        $.post('http://zhufu.sinaapp.com/api/mail.php', {
-            content: encodeURIComponent($('#J-mybug').val()),
+        $.post('http://zhufu.sinaapp.com/api/mail.php?v=' + VERSION, {
+            content: encodeURIComponent('版本号：' + VERSION + ';;;' + $('#J-mybug').val()),
             email: encodeURIComponent($('#J-email').val())
         }).done(function() {
             $t.button('reset');
@@ -305,7 +304,7 @@ function getHot() {
     } catch (e) {}
     // console.log(kws);
     if (!kws) {
-        $.getJSON('http://zhufu.sinaapp.com/api/gethot.php').done(function(json) {
+        $.getJSON('http://zhufu.sinaapp.com/api/gethot.php?v=' + VERSION).done(function(json) {
             cb(json);
             try {
                 sessionStorage.hotKeywords = JSON.stringify(json);

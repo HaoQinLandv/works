@@ -1,4 +1,5 @@
 var ls = window.localStorage;
+var VERSION = chrome.runtime.getManifest().version;
 //关键词
 var keywords = ls.keywords ? ls.keywords : '[]';
 try {
@@ -10,6 +11,7 @@ try {
 $(function() {
     var pager = {};
     var curKeyword;
+    var $info = $('#J-info');
     var Template = $('#J-template').html();
     var $content = $('#J-content').delegate('button[data-link]', 'click', function() {
         var url = $(this).data('link');
@@ -20,6 +22,7 @@ $(function() {
     var $loadmore = $('#J-loadmore').click(function() {
         $loadmore.hide();
         $loading.show();
+
         if (curKeyword) {
             getData(curKeyword, pager[curKeyword]);
         }
@@ -32,7 +35,7 @@ $(function() {
         $content.empty();
         $t.parent().addClass('active');
         curKeyword = q;
-        pager[q] = (pager[q] ? pager[q] : 1) | 0;
+        pager[q] = 1;
         getData(q, pager[q]);
     });
     var html = '';
@@ -43,12 +46,12 @@ $(function() {
     if (keywords.length && keywords[0] !== '') {
         curKeyword = keywords[0];
         getData(keywords[0], 1);
-    }else{
+    } else {
         $loadmore.hide();
         $loading.hide();
+        $info.hide();
         $('#J-empty-info').fadeIn();
     }
-
     $('#J-top').click(function() {
         $('body').animate({
             scrollTop: 0
@@ -72,8 +75,9 @@ $(function() {
         xhr && xhr.abort();
         $loadmore.hide();
         $loading.show();
+        $info.hide();
 
-        xhr = $.getJSON('http://zhufu.sinaapp.com/api/search.php?q=' + encodeURIComponent(q) + '&page=' + page).done(function(json) {
+        xhr = $.getJSON('http://zhufu.sinaapp.com/api/search.php?v=' + VERSION + '&q=' + encodeURIComponent(q) + '&page=' + page).done(function(json) {
             if (json && json.errno === 0) {
                 var html = '';
                 json.data.forEach(function(v) {
@@ -87,10 +91,22 @@ $(function() {
                     $content.append(html);
                 }
                 pager[q] = ++page;
-            } else if ($json.errno === 1) {
-                alert('没有更多折扣商品了');
+                if (json.data.length < 30) {
+                    $info.html('没有更多特价商品了').show();
+                    $loadmore.hide();
+                } else {
+                    $info.hide();
+                    $loadmore.show();
+
+                }
+            } else if (json.errno === 1) {
+                $loadmore.hide();
+                $info.html('没有更多特价商品了').show();
+            } else if (json.errno === 2) {
+                $info.html('在三天内的特价信息中，木有找到【<span class="keyword">' + q + '</span>】的特价信息，再等等吧~').show();
+                $loadmore.hide();
             }
-            $loadmore.show();
+
             $loading.hide();
         });
     }

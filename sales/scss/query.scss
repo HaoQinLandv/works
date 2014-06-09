@@ -44,6 +44,15 @@
 .item:nth-child(odd){
     background-color: #f7f7f7;
 }
+
+#J-info{
+    text-align: center;
+    font-weight: bold;
+    display: none;
+    .keyword{
+        color:#F48C12
+    }
+}
 .item{
     margin-bottom: 20px;
     padding: 10px;
