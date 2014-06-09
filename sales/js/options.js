@@ -183,7 +183,7 @@ $(function() {
         var $t = $(this);
         $t.button('loading');
         $.ajax({
-            url: 'http://clients2.google.com/service/update2/crx?response=updatecheck&x=id%3Dfencnigkojiegaifcngopoenckcgbcoo%26uc',
+            url: 'http://clients2.google.com/service/update2/crx?prod=chromecrx&prodchannel=stable&prodversion=' + getVersionByUa() + '&lang=' + navigator.language + '&x=id%3Dfencnigkojiegaifcngopoenckcgbcoo%26v%3D' + version + '%26uc',
             dataType: 'xml',
             success: function(xml) {
                 if (!xml) {
@@ -192,7 +192,11 @@ $(function() {
                 }
                 var $updateInfo = $(xml).find('updatecheck');
                 var xmlVersion = $updateInfo.attr('version');
-                if (xmlVersion) {
+                var xmlStatus = $updateInfo.attr('status');
+                if (xmlStatus === 'noupdate') {
+                    //已经是最新版
+                    $('#J-update-info').html('已经是最新版').removeClass('error');
+                } else if (xmlVersion) {
                     var v = verson_compare(xmlVersion, version);
                     if (v > 0 && $updateInfo.attr('codebase')) {
                         //有更新
@@ -204,7 +208,7 @@ $(function() {
                         //测试版？
                         $('#J-update-info').html('额，难道是传说中的测试版？').removeClass('error');
                     }
-                }else{
+                } else {
                     $('#J-update-info').html('已经是最新版').removeClass('error');
                 }
 
@@ -243,6 +247,14 @@ $(function() {
     });
 
 });
+
+function getVersionByUa() {
+    var m = navigator.userAgent.match(/Chrome\/([\d.]+)/);
+    if (m[1]) {
+        return m[1];
+    }
+    return 0;
+}
 
 function insertKeyword(kw) {
     if (keywords.indexOf(kw) !== -1) {
