@@ -183,6 +183,9 @@ function checkKeyWordNotice() {
                             buttons: [{
                                 title: '立即去抢购 >>',
                                 iconUrl: '../icon64.png'
+                            }, {
+                                title: '设置消息提醒 >>',
+                                iconUrl: 'img/options.png'
                             }]
                         };
                         id = 'kw' + v.id;
@@ -211,6 +214,9 @@ function checkKeyWordNotice() {
                             buttons: [{
                                 title: '立即去抢购 >>',
                                 iconUrl: '../icon64.png'
+                            }, {
+                                title: '设置消息提醒 >>',
+                                iconUrl: 'img/options.png'
                             }]
                         };
                         id = 'item' + v.id;
@@ -264,19 +270,26 @@ chrome.notifications.onClicked.addListener(function(id) {
         }
     }
 });
-chrome.notifications.onButtonClicked.addListener(function(id) {
+chrome.notifications.onButtonClicked.addListener(function(id, i) {
     if (ss[id]) {
-        try {
-            var obj = JSON.parse(ss[id]);
-            if (obj.url) {
-                chrome.tabs.create({
-                    url: obj.url
-                });
-            }
+        if (i === 0) {
+            try {
+                var obj = JSON.parse(ss[id]);
+                if (obj.url) {
+                    chrome.tabs.create({
+                        url: obj.url
+                    });
+                }
 
-        } catch (e) {
-            ss.removeItem(id);
+            } catch (e) {
+                ss.removeItem(id);
+            }
+        } else if (i === 1) {
+            chrome.tabs.create({
+                url: 'options.html'
+            });
         }
+
     } else if (id.indexOf('update_notify') === 0) {
         chrome.tabs.create({
             url: 'options.html'
