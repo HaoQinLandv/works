@@ -135,11 +135,7 @@ chrome.runtime.onMessage.addListener(function(obj, sender, callback) {
 
 
 noticeTimer = setInterval(checkKeyWordNotice, noticeInterval);
-
 function checkKeyWordNotice() {
-    if (keywords.length === 0) {
-        return;
-    }
     if (!settings.openNotice && (keywords.length === 0 || !settings.openKeyword)) {
         //没有打开提醒，并且关键词也没打开
         return;
