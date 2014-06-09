@@ -60,7 +60,7 @@ if (!curmaxid) {
 feedTimer = setInterval(checkNewFeed, feedInterval);
 
 function checkNewFeed() {
-    var curmaxidloop = ls.maxCnDealId;
+    var curmaxidloop = ls.maxCnDealId ? ls.maxCnDealId : 0;
     $.get('http://zhufu.sinaapp.com/api/newfeed.php?v=' + VERSION + '&id=' + curmaxidloop, function(data) {
         if (data > 99) {
             //不再更新
