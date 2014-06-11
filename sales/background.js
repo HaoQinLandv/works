@@ -135,6 +135,7 @@ chrome.runtime.onMessage.addListener(function(obj, sender, callback) {
 
 
 noticeTimer = setInterval(checkKeyWordNotice, noticeInterval);
+
 function checkKeyWordNotice() {
     if (!settings.openNotice && (keywords.length === 0 || !settings.openKeyword)) {
         //没有打开提醒，并且关键词也没打开
@@ -286,10 +287,16 @@ chrome.notifications.onButtonClicked.addListener(function(id, i) {
             });
         }
 
-    } else if (id.indexOf('update_notify') === 0) {
-        chrome.tabs.create({
-            url: 'options.html'
-        });
+    } else if (id.indexOf('install_') === 0) {
+        if (i === 0) {
+            chrome.tabs.create({
+                url: 'options.html'
+            });
+        } else if (i === 1) {
+            chrome.tabs.create({
+                url: 'help.html'
+            });
+        }
     }
 });
 /**
@@ -336,10 +343,13 @@ chrome.runtime.onInstalled.addListener(function(details) {
         opt.buttons = [{
             title: '设置 >>',
             iconUrl: 'img/options.png'
+        }, {
+            title: '查看帮助 >>',
+            iconUrl: 'img/question.png'
         }];
-        chrome.notifications.create('update_notify' + (+new Date()), opt, function() {});
+        chrome.notifications.create('install_' + (+new Date()), opt, function() {});
     } else if (details.reason === 'update') {
         version = chrome.runtime.getManifest().version;
+        // chrome.notifications.create('update_notify' + (+new Date()), opt, function() {});
     }
-    // chrome.notifications.create('update_notify' + (+new Date()), opt, function() {});
 });
