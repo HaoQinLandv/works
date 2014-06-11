@@ -38,6 +38,8 @@ $(function() {
         chrome.tabs.create({
             url: $(this).data('link')
         });
+    }).delegate('p.J-desc', 'click', function() {
+        $(this).find('.J-more').toggle();
     });
 
     function append(json, source) {
@@ -48,7 +50,12 @@ $(function() {
             var html = '';
             // console.log(json.data);
             json.data.forEach(function(v) {
-                v.detail = v.detail.slice(0, 80);
+                var detail = v.detail;
+                v.detail = detail.slice(0, 80);
+                v.more = detail.slice(80);
+                if (!v.more) {
+                    v.more = '';
+                }
                 html += TPL(Template, v);
             });
             $content.append(html);

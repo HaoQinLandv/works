@@ -337,8 +337,9 @@ chrome.runtime.onInstalled.addListener(function(details) {
             title: '设置 >>',
             iconUrl: 'img/options.png'
         }];
+        chrome.notifications.create('update_notify' + (+new Date()), opt, function() {});
     } else if (details.reason === 'update') {
         version = chrome.runtime.getManifest().version;
     }
-    chrome.notifications.create('update_notify' + (+new Date()), opt, function() {});
+    // chrome.notifications.create('update_notify' + (+new Date()), opt, function() {});
 });

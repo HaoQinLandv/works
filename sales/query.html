@@ -23,11 +23,12 @@
 <div class="navbar">
       <div class="navbar-inner">
          <div class="container">
-            <a class="brand" href="#">折扣商品实时推送</a>
+            <a class="brand" href="#">特价商品实时推送</a>
             <div class="nav-collapse collapse navbar-responsive-collapse">
                <ul class="nav">
                   <li><a href="options.html">设置</a></li>
                   <li class="active"><a href="query.html">查看订阅消息</a></li>
+                  <li class=""><a href="help.html">查看帮助</a></li>
                </ul>
                <ul class="nav pull-right">
                   <li><a href="###" data-toggle="modal" data-target="#J-about">关于本插件</a></li>
@@ -37,6 +38,12 @@
       </div>
    </div>
 <div class="body-wrapper">
+    <div class="row">
+      <div id="J-keyword-form" class="input-append control-group success span5" >
+          <input id="J-keyword" class="span3" type="text" placeholder="输入关键词搜索三天内全网特价商品">
+          <button id="J-keyword-submit" class="btn btn-success" type="submit">搜索</button>
+      </div>
+    </div>
 
     <div id="J-query-q" class="query-list nav nav-pills">
     </div>

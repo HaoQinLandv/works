@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>帮助_特价商品实时推送</title>
+    <link rel="stylesheet" type="text/css" href="css/bootmetro.min.css">
+    <link rel="stylesheet" type="text/css" href="css/bootmetro-responsive.min.css">
+    <link rel="stylesheet" type="text/css" href="css/bootmetro-icons.min.css">
+    <link rel="stylesheet" type="text/css" href="css/bootmetro-ui-light.min.css">
+    <link rel="stylesheet" type="text/css" href="css/switchery.min.css">
+    <link rel="stylesheet" href="css/options.css">
+    <script src="js/jquery.js"></script>
+    <link rel="stylesheet" href="css/help.css">
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/bootmetro-panorama.min.js"></script>
+    <script type="text/javascript" src="js/bootmetro-pivot.min.js"></script>
+    <script type="text/javascript" src="js/bootmetro-charms.min.js"></script>
+    <script src="js/switchery.min.js"></script>
+    <script src="js/options.js"></script>
+</head>
+<body>
+<div class="navbar">
+  <div class="navbar-inner">
+     <div class="container">
+        <a class="brand" href="#">特价商品实时推送</a>
+        <div class="nav-collapse collapse navbar-responsive-collapse">
+           <ul class="nav">
+              <li><a href="options.html">设置</a></li>
+              <li><a href="query.html">查看订阅消息</a></li>
+              <li class="active"><a href="###">查看帮助</a></li>
+           </ul>
+           <ul class="nav pull-right">
+              <li><a href="###" data-toggle="modal" data-target="#J-about">关于本插件</a></li>
+           </ul>
+        </div>
+     </div>
+  </div>
+</div>
+<div class="body-wrapper">
+    <div class="basic">
+        <p>基本操作示意图，<a href="http://zhufu.sinaapp.com/api/demo.gif">查看动态演示</a></p>
+        <img src="img/demo.png" alt="操作演示">
+
+    </div>
+    <h3 class="question  icon-question">哇，特价商品太多了，弹窗提醒太给力，我怎么关闭它？</h3>
+    <div class="answer">
+        <span class="icon-chat"></span>
+        <p>是可以设置消息提醒的，而且可以选择安静时间哦~具体步骤：
+            <ol>
+                <li>打开【<a href="options.html">设置页面</a>】</li>
+                <li>找到【是否开启桌面提醒】看下它的按钮是否关闭状态（绿色是开启状态，灰色是关闭状态哦~）</li>
+                <li>弹出数量在【设置最大弹窗数量】里面也可以设置哦~</li>
+            </ol>
+        </p>
+    </div>
+    <h3 class="question  icon-question">我不想再上班时间弹提醒，其他时间又想看到特价提醒，我怎么办？</h3>
+    <div class="answer">
+        <span class="icon-chat"></span>
+        <p>嗯，有办法！具体步骤：
+            <ol>
+                <li>打开【<a href="options.html">设置页面</a>】页面</li>
+                <li>找到【设置安静时间段】看下它的按钮是否打开状态（绿色是开启状态，灰色是关闭状态哦~）</li>
+                <li>选择安静时间就可以了，比如9:00~18:00</li>
+            </ol>
+        </p>
+    </div>
+    <h3 class="question  icon-question">我要买个【豆浆机】，其他商品我不关心，只想要【豆浆机】的提醒</h3>
+    <div class="answer">
+        <span class="icon-chat"></span>
+        <p>嗯，有办法！具体步骤：
+            <ol>
+                <li>打开【<a href="options.html">设置页面</a>】页面</li>
+                <li>找到【订阅打折商品关键字】输入【豆浆机】点击添加</li>
+                <li>记得打开【开启关键字商品桌面提醒】的开关</li>
+                <li>不想要关键字之外的提醒，按照第一条问题，关掉【是否开启桌面提醒】即可</li>
+            </ol>
+        </p>
+    </div>
+    <h3 class="question  icon-question">我错过了关键字提醒，或者想看其他关键字提醒怎么办？</h3>
+    <div class="answer">
+        <span class="icon-chat"></span>
+        <p>具体步骤：
+            <ol>
+                <li>打开【<a href="query.html">查看订阅消息</a>】页面</li>
+                <li>在【输入框】输入【关键字】点击搜索</li>
+            </ol>
+        </p>
+    </div>
+</div>
+<div id="J-about" class="modal hide fade in" >
+  <div class="modal-header">
+     <button type="button" class="close" data-dismiss="modal"></button>
+     <h3 id="myModalLabel">感谢使用本插件！</h3>
+  </div>
+  <div class="modal-body">
+     <ul class="nav nav-tabs" id="J-model-tab">
+         <li class="active"><a href="#J-ver-box">当前版本</a></li>
+         <li><a href="#J-bug">报告问题</a></li>
+       </ul>
+
+       <div class="tab-content">
+         <div id="J-ver-box" class="tab-pane active">
+             <p id="J-version"></p>
+             <div>
+                <button class="btn btn-success" id="J-update-btn" data-loading-text="检查中...">检查更新</button>
+                <span id="J-update-info"></span>
+             </div>
+         </div>
+         <div class="tab-pane" id="J-bug">
+             <div class="form-horizontal">
+                  <div class="control-group">
+                     <label class="control-label" for="J-mybug">问题描述</label>
+                     <div class="controls">
+                        <textarea rows="3" id="J-mybug"></textarea>
+                     </div>
+                  </div>
+                  <div class="control-group">
+                     <label class="control-label" for="J-email">Email</label>
+                     <div class="controls">
+                        <input type="text" id="J-email" placeholder="您的Email地址">
+                     </div>
+                  </div>
+                  <div class="control-group">
+                     <div class="controls">
+                        <button id="J-send-mail" type="submit" class="btn" data-loading-text="发送中...">发送</button>
+                     </div>
+                  </div>
+               </div>
+         </div>
+       </div>
+
+  </div>
+  <div class="modal-footer">
+     <button class="btn" data-dismiss="modal">关闭</button>
+     <button id="J-like" class="btn btn-success" data-link="https://chrome.google.com/webstore/detail/fencnigkojiegaifcngopoenckcgbcoo">我喜欢这个插件，我要去Chrome商店给好评</button>
+  </div>
+</div>
+</body>
+</html>

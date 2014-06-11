@@ -110,6 +110,28 @@ $(function() {
             $loading.hide();
         });
     }
+
+
+    $('#J-keyword-submit').unbind().click(function() {
+        keypress();
+        return false;
+    });
+    $('#J-keyword').unbind().keypress(function(e) {
+        if (e.keyCode === 13) {
+            keypress();
+        }
+    });
+    function keypress(){
+        var q = $.trim($('#J-keyword').val());
+        if(q.length!==0){
+            $('#J-query-q').find('li.active').removeClass('active');
+            $content.empty();
+            getData(q, 1);
+
+        }else{
+            $('#J-keyword').focus();
+        }
+    }
 });
 
 
