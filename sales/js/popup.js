@@ -1,6 +1,6 @@
 var VERSION = chrome.runtime.getManifest().version;
 var API = {
-    list: 'http://zhufu.sinaapp.com/api/getdata.php?v=' + VERSION + 'page=',
+    list: 'http://zhufu.sinaapp.com/api/getdata.php?v=' + VERSION + '&page=',
     maxid: 'http://zhufu.sinapp.com/api/getmaxid.php?v=' + VERSION
 };
 var emptyFn = function() {};
