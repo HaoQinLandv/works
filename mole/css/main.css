@@ -1,0 +1,16 @@
+/* line 1, ../scss/main.scss */
+* {
+  padding: 0;
+  margin: 0;
+}
+
+/* line 5, ../scss/main.scss */
+body {
+  margin: 0 auto;
+  width: 318px;
+}
+
+/* line 9, ../scss/main.scss */
+canvas {
+  border: 1px solid #ccc;
+}
