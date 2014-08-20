@@ -1,16 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1,maximum-scale=1,user-scalable=no">
     <meta charset="UTF-8">
     <title>打地鼠</title>
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
+<header>
+    <div class="logo"></div>
+    <div class="banner">
+        <img src="img/banner.png" alt="拍死五仁月饼" width="320px">
+    </div>
+    <div class="branch"></div>
+</header>
+<div class="timer">
+    <p>倒计时 <span id="J-timer">30</span>秒</p>
+    <div class="progress">
+        <span id="J-progress" class="pbar"></span>
+    </div>
+</div>
+<div class="game">
+<div class="item"></div>
+<div class="item"></div>
+<div class="item"></div>
+<div class="item"></div>
+<div class="item"></div>
+<div class="item"></div>
+<div class="item"></div>
+<div class="item"></div>
+<div class="item"></div>
 <canvas id="c"></canvas>
+</div>
+<footer>
+    <p>* 本活动最终解释权归主办方百度所有</p>
+    <p>&copy; 2014 Baidu </p>
+</footer>
 <script src="js/base/pool.js"></script>
 <script src="js/base/raf.js"></script>
 <script src="js/base/stage.js"></script>
 <script src="js/base/sprite.js"></script>
-    <script src="js/main.js"></script>
+<script src="js/cake.js"></script>
+<script src="js/main.js"></script>
 </body>
 </html>

@@ -1,16 +1,166 @@
-/* line 1, ../scss/main.scss */
+/* line 3, ../scss/main.scss */
 * {
   padding: 0;
   margin: 0;
 }
 
-/* line 5, ../scss/main.scss */
+/* line 8, ../scss/main.scss */
 body {
-  margin: 0 auto;
-  width: 318px;
+  background: #1543aa url(../img/bg.png) no-repeat top center;
+  -webkit-background-size: 460px auto;
+  -moz-background-size: 460px auto;
+  -o-background-size: 460px auto;
+  background-size: 460px auto;
 }
 
-/* line 9, ../scss/main.scss */
-canvas {
-  border: 1px solid #ccc;
+/* line 12, ../scss/main.scss */
+header {
+  position: relative;
+  width: 100%;
+  height: 144px;
+  margin-bottom: 5px;
+}
+/* line 17, ../scss/main.scss */
+header .logo {
+  height: 24px;
+  width: 64px;
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  background: url(../img/logo.png) no-repeat center center;
+  -webkit-background-size: 64px auto;
+  -moz-background-size: 64px auto;
+  -o-background-size: 64px auto;
+  background-size: 64px auto;
+  z-index: 2;
+}
+/* line 27, ../scss/main.scss */
+header .banner {
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  z-index: 1;
+}
+/* line 33, ../scss/main.scss */
+header .banner img {
+  width: 320px;
+}
+/* line 36, ../scss/main.scss */
+header .branch {
+  position: absolute;
+  z-index: 2;
+  top: 15px;
+  right: 0;
+  width: 129px;
+  height: 65px;
+  background: url(../img/branch.png) no-repeat center center;
+  -webkit-background-size: 129px auto;
+  -moz-background-size: 129px auto;
+  -o-background-size: 129px auto;
+  background-size: 129px auto;
+}
+
+/* line 47, ../scss/main.scss */
+.timer {
+  color: white;
+  width: 242px;
+  height: 30px;
+  margin: 0 auto 15px;
+  font-size: 12px;
+}
+/* line 53, ../scss/main.scss */
+.timer p {
+  float: left;
+  margin-right: 5px;
+  height: 28px;
+  line-height: 28px;
+}
+/* line 59, ../scss/main.scss */
+.timer #J-timer {
+  font-size: 18px;
+}
+/* line 62, ../scss/main.scss */
+.timer .progress {
+  position: relative;
+  float: left;
+  width: 160px;
+  height: 10px;
+  background: #012e92;
+  margin-top: 10px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  border-radius: 5px;
+  -webkit-box-shadow: inset 0 0 13px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: inset 0 0 13px rgba(0, 0, 0, 0.5);
+  box-shadow: inset 0 0 13px rgba(0, 0, 0, 0.5);
+}
+/* line 72, ../scss/main.scss */
+.timer .pbar {
+  position: absolute;
+  left: 0;
+  height: 10px;
+  width: 100%;
+  background-color: #e3350c;
+  background-image: -webkit-gradient(linear, to right, to left, color-stop(0%, #c42800), color-stop(100%, #de4a02));
+  background-image: -webkit-linear-gradient(to right, #c42800, #de4a02);
+  background-image: -moz-linear-gradient(to right, #c42800, #de4a02);
+  background-image: -o-linear-gradient(to right, #c42800, #de4a02);
+  background-image: linear-gradient(to right, #c42800, #de4a02);
+  -webkit-border-radius: 5px 0 0 5px;
+  -moz-border-radius: 5px 0 0 5px;
+  -ms-border-radius: 5px 0 0 5px;
+  -o-border-radius: 5px 0 0 5px;
+  border-radius: 5px 0 0 5px;
+}
+
+/* line 82, ../scss/main.scss */
+.game {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  margin: 0 auto 20px;
+  padding: 2.5px;
+  border: 1px solid #25a8e7;
+  background-color: #0480d1;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  border-radius: 5px;
+}
+/* line 92, ../scss/main.scss */
+.game div.item {
+  z-index: 1;
+  width: 93px;
+  height: 93px;
+  float: left;
+  margin: 2.5px;
+  background: #113992 url(../img/hole.png) no-repeat center center;
+  border: 1px solid #25a8e7;
+  -webkit-box-shadow: inset 0 5px 3px #012471;
+  -moz-box-shadow: inset 0 5px 3px #012471;
+  box-shadow: inset 0 5px 3px #012471;
+  -webkit-background-size: 80px auto;
+  -moz-background-size: 80px auto;
+  -o-background-size: 80px auto;
+  background-size: 80px auto;
+}
+/* line 103, ../scss/main.scss */
+.game canvas {
+  z-index: 2;
+  position: absolute;
+  top: 2.5px;
+  left: 2.5px;
+  width: 300px;
+  height: 300px;
+}
+
+/* line 112, ../scss/main.scss */
+footer p {
+  line-height: 20px;
+  color: #011134;
+  text-align: center;
+  font-size: 12px;
 }

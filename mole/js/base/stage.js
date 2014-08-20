@@ -55,9 +55,10 @@
         },
         init: function() {
             this.timeData = [];
-            this.evts = [];
+            this.evts = {};
             this.reset();
             this.bindEvent();
+            return this;
         },
         start: function() {
             this.reset().play();
@@ -88,7 +89,7 @@
             }
             return this;
         },
-        play: function() {
+        play: function(msg) {
             this.status = 'play';
             var now = this.now = $.timestamp();
             //精灵初始化
@@ -104,7 +105,7 @@
             this.update();
             return this;
         },
-        stop: function() {
+        stop: function(msg) {
             this.status = 'stop';
             this.timeData.length = 0;
             this.fire('stop', msg);
@@ -144,6 +145,7 @@
             // 处理精灵类
             for (i = 0, len = sprites.length; i < len; i++) {
                 sprite = sprites[i];
+
                 if (sprite.canDestroy()) {
                     sprite.destroy();
                     self.removeSprite(sprite);
@@ -158,7 +160,7 @@
             return this;
         },
         //添加精灵
-        addSprite: function() {
+        addSprite: function(sprite) {
             if (!~this.sprites.indexOf(sprite)) {
                 this.sprites.push(sprite);
             }
@@ -219,14 +221,14 @@
                     }
                     break;
             }
-            var evts = this.evts[type] || [];
+            this.evts[type] = this.evts[type] || [];
             var obj = {
                 fn: cb,
                 scope: scope,
                 args: args,
                 _cb: callback
             };
-            evts.push(obj);
+            this.evts[type].push(obj);
             return this;
         },
         //解除绑定
@@ -258,6 +260,7 @@
             if (this.status !== 'play' && type !== this.status) {
                 return this;
             }
+            // console.log(this.evts);
             var evts = this.evts[type];
             if (evts && evts.length > 0) {
                 if (type === 'touchstart') {
