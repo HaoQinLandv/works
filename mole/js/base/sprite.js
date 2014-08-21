@@ -127,6 +127,11 @@
             this.aniStepTime = 1000 / fps;
             return this;
         },
+        //设置frames
+        setFrames: function(frames) {
+            this.frames = frames;
+            return this;
+        },
         setAni: function(name) {
             if (this.curAnimate === name && this.curAniStep !== 0) {
                 return this;
