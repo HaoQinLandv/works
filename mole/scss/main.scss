@@ -170,7 +170,7 @@ i{
 }
 .mydia2{
     background: #007be2 url(../img/bg2.png) no-repeat center bottom;
-    height: 290px;
+    height: 300px;
     .close{
         z-index: 29999;
         background: url(../img/close.png) no-repeat top center;
@@ -233,5 +233,57 @@ button{
     @include border-radius(10px);
     &[disabled]{
         background-color: #E9B600;
+    }
+}
+.loading{
+    z-index: 39999;
+    position: fixed;
+    top: 48%;
+    left: 48%;
+    img{
+        background-color: transparent;
+    }
+}
+#J-fail{
+    z-index: 89999;
+    position: fixed;
+    top:0;
+    left:0;
+    right: 0;
+    bottom:0;
+    background: white;
+    opacity: 0;
+    width:100%;
+    height:100%;
+    -webkit-animation: fadeIn .6s both ease-in;
+    animation: fadeIn .6s both ease-in;
+}
+
+@-webkit-keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    30% {
+        opacity: .7;
+    }
+    50% {
+        opacity: .9;
+    }
+    100%{
+        opacity: 0
+    }
+}
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    30% {
+        opacity: .7;
+    }
+    50% {
+        opacity: .9;
+    }
+    100%{
+        opacity: 0
     }
 }

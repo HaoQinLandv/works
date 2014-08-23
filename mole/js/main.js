@@ -203,12 +203,16 @@
         stage = new Stage('c', width, height);
         stage.on('update', timer).on('stop', function(msg) {
             if (msg === 'fail') {
-                show(msg);
+                $('#J-fail').show();
+                setTimeout(function() {
+                    show(msg);
+                    $('#J-fail').hide();
+                }, 640);
             } else {
                 showLoading();
-                setTimeout(function(){
+                setTimeout(function() {
                     show();
-                },1000);
+                }, 1000);
             }
         });
         // start();
@@ -230,13 +234,13 @@
             closeLayer();
         });
         $('#J-address').click(function() {
-            alert(111);
+            alert('填写url');
         });
     }
 
     function show(msg) {
         $('.J-num').html(stage.score);
-        $('#J-gameOver').hide();
+        $('.J-gameOver').hide();
         if (msg === 'fail') {
             $('#J-over').show();
         } else {
@@ -245,10 +249,12 @@
         $('#J-result').show();
         $('#J-mask').show();
     }
-    function showLoading(){
+
+    function showLoading() {
         $('#J-mask').show();
         $('#J-loading').show();
     }
+
     function start() {
         if (stage.sprites) {
             stage.sprites.forEach(function(s) {
@@ -352,5 +358,6 @@
     function closeLayer() {
         $('.J-mydia').hide();
         $('#J-mask').hide();
+        $('#J-loading').hide();
     }
 }(window, document, Zepto));

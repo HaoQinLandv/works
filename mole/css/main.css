@@ -235,7 +235,7 @@ i {
 /* line 171, ../scss/main.scss */
 .mydia2 {
   background: #007be2 url(../img/bg2.png) no-repeat center bottom;
-  height: 290px;
+  height: 300px;
 }
 /* line 174, ../scss/main.scss */
 .mydia2 .close {
@@ -311,4 +311,76 @@ button {
 /* line 234, ../scss/main.scss */
 button[disabled] {
   background-color: #E9B600;
+}
+
+/* line 238, ../scss/main.scss */
+.loading {
+  z-index: 39999;
+  position: fixed;
+  top: 48%;
+  left: 48%;
+}
+/* line 243, ../scss/main.scss */
+.loading img {
+  background-color: transparent;
+}
+
+/* line 247, ../scss/main.scss */
+#J-fail {
+  z-index: 89999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: white;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-animation: fadeIn .6s both ease-in;
+  animation: fadeIn .6s both ease-in;
+}
+
+@-webkit-keyframes fadeIn {
+  /* line 263, ../scss/main.scss */
+  from {
+    opacity: 0;
+  }
+
+  /* line 266, ../scss/main.scss */
+  30% {
+    opacity: .7;
+  }
+
+  /* line 269, ../scss/main.scss */
+  50% {
+    opacity: .9;
+  }
+
+  /* line 272, ../scss/main.scss */
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeIn {
+  /* line 277, ../scss/main.scss */
+  from {
+    opacity: 0;
+  }
+
+  /* line 280, ../scss/main.scss */
+  30% {
+    opacity: .7;
+  }
+
+  /* line 283, ../scss/main.scss */
+  50% {
+    opacity: .9;
+  }
+
+  /* line 286, ../scss/main.scss */
+  100% {
+    opacity: 0;
+  }
 }
