@@ -191,6 +191,59 @@
     var img = new Image();
     img.src = './img/sprite.png';
     img.onload = init;
+    var sound;
+    var clickAudio, gameOverAudio;
+    if (Box.os.name === 'ios' && ('Audio' in window)) {
+        sourceLen++;
+
+        try {
+            //三秒加载不完声音，就超时
+            var timer = setTimeout(function() {
+                sound = null;
+                init();
+            }, 3000);
+            clickAudio = new Audio();
+            gameOverAudio = new Audio();
+            gameOverAudio.src = './game-over.mp3';
+            gameOverAudio.autobuffer = true;
+            gameOverAudio.load();
+            gameOverAudio.muted = true;
+
+            clickAudio.src = './click.mp3';
+            clickAudio.autobuffer = true;
+            clickAudio.load();
+            clickAudio.muted = true;
+            clickAudio.addEventListener('canplay', function() {
+                clearTimeout(timer);
+                if (clickAudio) {
+                    init();
+                }
+            });
+            clickAudio.addEventListener('error', function() {
+                clearTimeout(timer);
+                clickAudio = null;
+                init();
+            });
+            clickAudio.addEventListener('abort', function() {
+                clearTimeout(timer);
+                clickAudio = null;
+                init();
+            });
+
+            gameOverAudio.addEventListener('error', function() {
+                gameOverAudio = null;
+            });
+            gameOverAudio.addEventListener('abort', function() {
+                gameOverAudio = null;
+            });
+        } catch (e) {
+            gameOverAudio = null;
+            clickAudio = null;
+            console.log(e);
+        }
+
+    }
+
 
     function init() {
         sourceLen--;
@@ -201,8 +254,17 @@
         $canvas.width = width;
         $canvas.height = height;
         stage = new Stage('c', width, height);
-        stage.on('update', timer).on('stop', function(msg) {
+        stage.on('update', timer).on('touchstart', function() {
+            if (clickAudio) {
+                clickAudio.muted = false;
+                clickAudio.play();
+            }
+        }).on('stop', function(msg) {
             if (msg === 'fail') {
+                if (gameOverAudio) {
+                    gameOverAudio.muted = false;
+                    gameOverAudio.play();
+                }
                 $('#J-fail').show();
                 setTimeout(function() {
                     show(msg);
@@ -360,4 +422,6 @@
         $('#J-mask').hide();
         $('#J-loading').hide();
     }
+
+
 }(window, document, Zepto));
