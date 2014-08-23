@@ -203,11 +203,11 @@
                 init();
             }, 3000);
             clickAudio = new Audio();
-            gameOverAudio = new Audio();
-            gameOverAudio.src = './game-over.mp3';
-            gameOverAudio.autobuffer = true;
-            gameOverAudio.load();
-            gameOverAudio.muted = true;
+            // gameOverAudio = new Audio();
+            // gameOverAudio.src = './game-over.mp3';
+            // gameOverAudio.autobuffer = true;
+            // gameOverAudio.load();
+            // gameOverAudio.muted = true;
 
             clickAudio.src = './click.mp3';
             clickAudio.autobuffer = true;
@@ -230,14 +230,14 @@
                 init();
             });
 
-            gameOverAudio.addEventListener('error', function() {
-                gameOverAudio = null;
-            });
-            gameOverAudio.addEventListener('abort', function() {
-                gameOverAudio = null;
-            });
+            // gameOverAudio.addEventListener('error', function() {
+            //     gameOverAudio = null;
+            // });
+            // gameOverAudio.addEventListener('abort', function() {
+            //     gameOverAudio = null;
+            // });
         } catch (e) {
-            gameOverAudio = null;
+            // gameOverAudio = null;
             clickAudio = null;
             console.log(e);
         }
@@ -254,17 +254,17 @@
         $canvas.width = width;
         $canvas.height = height;
         stage = new Stage('c', width, height);
-        stage.on('update', timer).on('touchstart', function() {
+        stage.on('update', clock).on('touchstart', function() {
             if (clickAudio) {
                 clickAudio.muted = false;
                 clickAudio.play();
             }
         }).on('stop', function(msg) {
             if (msg === 'fail') {
-                if (gameOverAudio) {
-                    gameOverAudio.muted = false;
-                    gameOverAudio.play();
-                }
+                // if (gameOverAudio) {
+                //     gameOverAudio.muted = false;
+                //     gameOverAudio.play();
+                // }
                 $('#J-fail').show();
                 setTimeout(function() {
                     show(msg);
@@ -296,7 +296,7 @@
             closeLayer();
         });
         $('#J-address').click(function() {
-            alert('填写url');
+            location.href = 'success';
         });
     }
 
@@ -393,7 +393,7 @@
         lastSecond = 30;
     }
     //更新进度条和时间轴
-    function timer() {
+    function clock() {
         var w = Math.ceil((1 - (stage.duration / duration)) * 100);
         var s = Math.ceil((duration - stage.duration) / 1000);
         if (lastWidth !== w && w >= 0) {
