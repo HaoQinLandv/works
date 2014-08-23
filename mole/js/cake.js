@@ -1,8 +1,11 @@
-var Cake = function(x, y) {
+var Cake = function(x, y, name, cakes, names) {
     this.x = x;
     this.y = y;
     this.duration = 0;
-    this.init('enter');
+    this.cakes = cakes;
+    this.names = names;
+    this.setFrames(cakes[name]).init().setAni('enter');
+    this.cname = name;
 };
 var img = new Image();
 img.src = './img/sprite.png';
@@ -11,45 +14,20 @@ Cake.prototype = new Sprite('cake', {
     width: 82,
     height: 83,
     curAnimate: 'enter',
-    frames: {
-        enter: {
-            fps: 100,
-            times: 1,
-            data: [
-                [0, 0, 163, 165, 8, 8],
-                [0, 0, 163, 165, 16, 16],
-                [0, 0, 163, 165, 26, 26],
-                [0, 0, 163, 165, 38, 38],
-                [0, 0, 163, 165, 52, 52],
-                [0, 0, 163, 165, 68, 68],
-                [0, 0, 163, 165, 86, 86],
-                [0, 0, 163, 165, 106, 106],
-                [0, 0, 163, 165, 106, 106],
-                [0, 0, 163, 165, 106, 106],
-                [0, 0, 163, 165, 82, 83]
-            ]
-        },
-        normal: {
-            fps: 3,
-            times: 0,
-            data: [
-                [0, 0, 163, 165, 82, 83],
-                [0, 175, 163, 165, 82, 83]
-            ]
-        },
-        touch: {
-            fps: 3,
-            times: 1,
-            data: [
-                [77, 1, 99, 88]
-            ]
-        }
-    }
+    frames: {}
 });
-
+Cake.prototype.reset = function(x, y, g) {
+    // body...
+    this.status = '';
+    this.x = x;
+    this.y = y;
+    this.setAccelerate(g);
+    this.setAni('enter');
+    return this;
+};
 Cake.prototype.constructor = Cake;
 Cake.prototype.evtClick = function(e, stage) {
-    if (this.curAnimate === 'enter' || this.status === 'clicked') {
+    if (this.status === 'clicked') {
         return false;
     }
     var x = e.x,
@@ -60,21 +38,42 @@ Cake.prototype.evtClick = function(e, stage) {
     var x1 = this.x - this.dx;
     var y1 = this.y - this.dy;
 
-    // console.log(x, y, x0, x1, y0, y1);
     if (x > x0 && x < x1 && y > y0 && y < y1) {
         this.status = 'clicked';
         this.clickTime = Date.now();
-        this.setAni('touch');
-        // 分数加倍
-        stage.addScore(stage.hits);
+        if (this.cname === 'wuren') {
+            this.setAni('touch');
+            // 分数加倍
+            stage.addScore(1);
+        } else {
+            stage.stop('fail');
+        }
+
         return true;
     }
     return false;
+};
+Cake.prototype.setXY = function(x, y) {
+
+    return this;
 };
 Cake.prototype.nextAni = function() {
     if (this.curAnimate === 'enter') {
         this.setAni('normal');
         return true;
     }
+    // if (this.curAnimate === 'normal') {
+    //     this.setAni('outer');
+    //     return true;
+    // }
+    // if (this.curAnimate === 'outer') {
+    //     var names = this.names;
+    //     var cakes = this.cakes;
+    //     var r = random;
+    //     var i = random(0, names.length - 1);
+    //     this.name = names[i];
+    //     this.setFrames(cakes[names[i]]).init().setAni('enter');
+    //     return true;
+    // }
     return false;
 };

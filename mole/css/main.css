@@ -149,7 +149,7 @@ header .branch {
 }
 /* line 103, ../scss/main.scss */
 .game canvas {
-  z-index: 2;
+  z-index: 999;
   position: absolute;
   top: 2.5px;
   left: 2.5px;
@@ -163,4 +163,152 @@ footer p {
   color: #011134;
   text-align: center;
   font-size: 12px;
+}
+
+/* line 119, ../scss/main.scss */
+.hmask {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 999;
+}
+
+/* line 131, ../scss/main.scss */
+.mydia {
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+  border-radius: 10px;
+  position: fixed;
+  top: 10%;
+  left: 50%;
+  width: 248px;
+  height: 259px;
+  margin-left: -124px;
+  background: #007be2 url(../img/bg2.png) no-repeat top center;
+  -webkit-background-size: 250px auto;
+  -moz-background-size: 250px auto;
+  -o-background-size: 250px auto;
+  background-size: 250px auto;
+  -webkit-box-shadow: 1px 3px 1px #0064b8;
+  -moz-box-shadow: 1px 3px 1px #0064b8;
+  box-shadow: 1px 3px 1px #0064b8;
+  z-index: 1999;
+}
+/* line 145, ../scss/main.scss */
+.mydia .l-start .lbanner {
+  margin: 5px auto 5px;
+  text-align: center;
+}
+/* line 150, ../scss/main.scss */
+.mydia .l-start ul {
+  list-style: decimal inside none;
+}
+/* line 153, ../scss/main.scss */
+.mydia .l-start li {
+  color: white;
+  font-size: 12px;
+  line-height: 16px;
+  padding: 0 15px;
+}
+/* line 158, ../scss/main.scss */
+.mydia .l-start li span {
+  color: #fdfb37;
+}
+/* line 163, ../scss/main.scss */
+.mydia .btns {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* line 168, ../scss/main.scss */
+i {
+  font-style: normal;
+}
+
+/* line 171, ../scss/main.scss */
+.mydia2 {
+  background: #007be2 url(../img/bg2.png) no-repeat center bottom;
+  height: 290px;
+}
+/* line 174, ../scss/main.scss */
+.mydia2 .close {
+  z-index: 29999;
+  background: url(../img/close.png) no-repeat top center;
+  display: inline-block;
+  width: 44px;
+  height: 44px;
+  text-indent: -99em;
+  position: absolute;
+  right: -10px;
+  top: -8px;
+}
+/* line 186, ../scss/main.scss */
+.mydia2 .l-over p {
+  font-size: 14px;
+  line-height: 24px;
+  color: white;
+  padding: 0 13px 5px;
+}
+/* line 192, ../scss/main.scss */
+.mydia2 .l-over .num {
+  color: #fe621e;
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0 2px;
+}
+/* line 198, ../scss/main.scss */
+.mydia2 .l-over .rank {
+  color: #fce918;
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0 2px;
+}
+/* line 205, ../scss/main.scss */
+.mydia2 .over-banner {
+  position: relative;
+  text-align: center;
+}
+/* line 208, ../scss/main.scss */
+.mydia2 .over-banner img {
+  margin: 30px auto 10px;
+}
+/* line 211, ../scss/main.scss */
+.mydia2 .over-banner span.score {
+  font-size: 20px;
+  color: white;
+  font-weight: bold;
+  position: absolute;
+  top: 25px;
+  right: 58px;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.75);
+}
+
+/* line 223, ../scss/main.scss */
+button {
+  color: white;
+  background: #fdd237;
+  border: 0 none;
+  padding: 5px 12px;
+  font-size: 18px;
+  text-align: center;
+  text-shadow: 1px 1px 1px #b58f04;
+  -webkit-box-shadow: 1px 3px 2px #c89d01;
+  -moz-box-shadow: 1px 3px 2px #c89d01;
+  box-shadow: 1px 3px 2px #c89d01;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+  border-radius: 10px;
+}
+/* line 234, ../scss/main.scss */
+button[disabled] {
+  background-color: #E9B600;
 }

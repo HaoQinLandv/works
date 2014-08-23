@@ -101,7 +101,7 @@ header{
         @include background-size(80px auto);
     }
     canvas{
-        z-index: 2;
+        z-index: 999;
         position: absolute;
         top: 2.5px;
         left: 2.5px;
@@ -114,4 +114,124 @@ footer p{
     color:#011134;
     text-align: center;
     font-size: 12px;
+}
+
+.hmask{
+    position: fixed;
+    height: 100%;
+
+    width: 100%;
+    bottom: 0;
+    top:0;
+    left:0;
+    right:0;
+    background: rgba(0,0,0,.6);
+    z-index: 999;
+}
+.mydia{
+    @include border-radius(10px);
+    position: fixed;
+    top: 10%;
+    left: 50%;
+    width: 248px;
+    height: 259px;
+    margin-left: -124px;
+    background: #007be2 url(../img/bg2.png) no-repeat top center;
+    @include background-size(250px auto);
+    @include box-shadow(1px 3px 1px #0064b8);
+    z-index: 1999;
+
+    .l-start{
+        .lbanner {
+            margin: 5px auto 5px;
+            text-align: center;
+        }
+
+        ul{
+            list-style: decimal inside none;
+        }
+        li{
+            color:white;
+            font-size: 12px;
+            line-height: 16px;
+            padding: 0 15px;
+            span{
+                color:#fdfb37;
+            }
+        }
+    }
+    .btns{
+        text-align: center;
+        margin-bottom: 10px;
+    }
+}
+i{
+    font-style: normal;
+}
+.mydia2{
+    background: #007be2 url(../img/bg2.png) no-repeat center bottom;
+    height: 290px;
+    .close{
+        z-index: 29999;
+        background: url(../img/close.png) no-repeat top center;
+        display: inline-block;
+        width: 44px;
+        height: 44px;
+        text-indent: -99em;
+        position: absolute;
+        right: -10px;
+        top: -8px;
+    }
+    .l-over{
+        p{
+            font-size: 14px;
+            line-height: 24px;
+            color:white;
+            padding: 0 13px 5px;
+        }
+        .num{
+            color:#fe621e;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0 2px;
+        }
+        .rank{
+            color: #fce918;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0 2px;
+        }
+    }
+    .over-banner{
+        position: relative;
+        text-align: center;
+        img{
+            margin:30px auto 10px;
+        }
+        span.score{
+            font-size: 20px;
+            color: white;
+            font-weight: bold;
+            position: absolute;
+            top: 25px;
+            right: 58px;
+            @include text-shadow(1px 1px 1px rgba(0,0,0,.75));
+        }
+    }
+
+}
+button{
+    color: white;
+    background: #fdd237;
+    border:0 none;
+    // height: 44px;
+    padding: 5px 12px;
+    font-size: 18px;
+    text-align: center;
+    @include text-shadow(1px 1px 1px #b58f04);
+    @include box-shadow(1px 3px 2px #c89d01);
+    @include border-radius(10px);
+    &[disabled]{
+        background-color: #E9B600;
+    }
 }

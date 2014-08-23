@@ -20,6 +20,10 @@ var Pool = function(creator, opts) {
 
 Pool.prototype = {
     constructor: Pool,
+    addFree: function(o) {
+        this.free.push(o);
+        return this;
+    },
     init: function() {
         var creator = this.creator,
             min = this.min,
@@ -38,6 +42,21 @@ Pool.prototype = {
                 obj.init();
             }
             this.free.push(obj);
+        }
+    },
+    getRandomOne: function() {
+        if (this.free.length > 0) {
+            var arr = this.free;
+            var t = (Math.random() * (arr.length - 2)) | 0;
+            var obj = this.free.splice(t, 1)[0];
+
+            this.busy.push(obj);
+            return obj;
+        } else {
+            var newObj = this.creator();
+            newObj.startBusyTime = new Date();
+            this.busy.push(newObj);
+            return newObj;
         }
     },
     //获取一个新对象

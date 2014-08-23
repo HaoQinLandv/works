@@ -39,11 +39,13 @@
         this.isLive = true;
         this.curAnimate = data.curAnimate || 'normal';
         var self = this;
+        this.g = data.g || 1;
         this.isNextFrame = typeof data.isNextFrame === 'function' ? function() {
             data.isNextFrame.call(self);
         } : function() {
             var now = Date.now();
             var dur = now - this.lastTime;
+            dur *= self.g;
             var stepTime = this.aniStepTime;
             return dur >= stepTime;
         };
@@ -54,6 +56,7 @@
         canDestroy: function() {
             return !this.isLive;
         },
+
         init: function(ani) {
             this.isLive = true;
             this.duration = 0;
@@ -64,7 +67,8 @@
             this.curAniStep = 0;
             //当前动画播放次数
             this.curAniPlayTimes = 0;
-            this.setAni(ani || this.curAnimate);
+            // this.setAni(ani || this.curAnimate);
+            return this;
         },
         evtClick: function() {
 
@@ -140,6 +144,7 @@
             this.curAnimate = name;
             //当前动画data
             var curData = this.curAniFrameData = this.frames[name].data;
+
             var data;
             for (var i = 0, len = curData.length; i < len; i++) {
                 data = curData[i];
@@ -159,6 +164,10 @@
         stopMove: function() {
             this.speedX = 0;
             this.speedY = 0;
+            return this;
+        },
+        setAccelerate: function(s) {
+            this.g = s | 0;
             return this;
         },
         setSpeed: function(x, y) {

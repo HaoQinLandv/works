@@ -5,6 +5,20 @@
  * $Id: stage.js 175996 2014-05-16 00:48:03Z wangyongqing01 $
  */
 (function(window, document, undefined) {
+    function stopEvent(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    function getOffset(node) {
+        var obj = node.getBoundingClientRect();
+        return {
+            left: obj.left + window.pageXOffset,
+            top: obj.top + window.pageYOffset,
+            width: Math.round(obj.width),
+            height: Math.round(obj.height)
+        };
+    }
     var clearObj = {},
         $ = {
             stopEvent: function(e) {
@@ -51,7 +65,7 @@
             return (Math.random() * (max - min + 1) + min) | 0;
         },
         bindEvent: function() {
-            this.bind(this.canvas, 'touchstart', this);
+            this.bind('touchstart', this);
         },
         init: function() {
             this.timeData = [];
@@ -80,7 +94,6 @@
             }
             var sprites = this.sprites,
                 sprite;
-
             for (var i = 0, len = sprites.length; i < len; i++) {
                 sprite = sprites[i];
                 if ($.isFunction(sprite[evt])) {
@@ -147,7 +160,6 @@
                 sprite = sprites[i];
 
                 if (sprite.canDestroy()) {
-                    sprite.destroy();
                     self.removeSprite(sprite);
                     i--;
                     len--;
@@ -202,6 +214,8 @@
                 timeData[i].startActive = true;
                 timeData[i].endActive = true;
             }
+            this.timeData.length = 0;
+            this.sprites.length = 0;
             return this;
         },
         //绑定自定义事件
@@ -260,7 +274,7 @@
             if (this.status !== 'play' && type !== this.status) {
                 return this;
             }
-            // console.log(this.evts);
+
             var evts = this.evts[type];
             if (evts && evts.length > 0) {
                 if (type === 'touchstart') {
@@ -290,11 +304,48 @@
         //事件绑定统一入口
         handleEvent: function(e) {
             var type = e.type;
+            switch (type) {
+                case 'touchstart':
+                    stopEvent(e);
+                    this.touchstart(e);
+                    break;
+            }
             $.isFunction(this[type]) && this[type](e);
             var evts = this.evts[type];
             if (evts && evts.length > 0) {
                 this.fire(type, e);
             }
+        },
+        touchstart: function(e) {
+            if (this.status !== 'play') {
+                return this;
+            }
+            var clicked = false,
+                args = {},
+                self = this;
+            var offset = getOffset(this.canvas);
+            var cTouches = e.changedTouches;
+            var touches;
+            for (var j = 0, len = cTouches.length; j < len && (touches = cTouches[j]); j++) {
+                args.x = touches.pageX - offset.left;
+                args.y = touches.pageY - offset.top;
+                var sprites = this.sprites,
+                    sprite;
+                // 处理精灵类
+                for (var i = 0, len = sprites.length; i < len; i++) {
+                    sprite = sprites[i];
+
+                    if (!sprite.canDestroy()) {
+                        clicked = sprite.evtClick(args, self);
+                        if (clicked) {
+                            break;
+                        }
+                    }
+                }
+            }
+
+
+            return clicked;
         },
         //绑定DOM事件
         bind: function(type, fn) {
