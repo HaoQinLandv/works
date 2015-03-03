@@ -168,13 +168,20 @@ function checkKeyWordNotice() {
                 var now = Date.now();
                 //订阅关键字,保证最多弹MAX_NOTIFY个
                 if (keywords.length && settings.openKeyword && notifyCount <= MAX_NOTIFY) {
-                    kw = searchKeywords(v.title);
+                    kw = searchKeywords(v.title, v.mallname);
                     // console.log(kw);
                     if (kw) {
                         v.keyword = kw;
+                        var t = kw.split('+'),
+                            title;
+                        if (t.length === 2) {
+                            title = '在【' + t[1] + '】找到【' + t[0] + '】的折扣信息';
+                        } else {
+                            title = '找到【' + kw + '】的折扣信息';
+                        }
                         opt = {
                             type: 'basic',
-                            title: '找到【' + kw + '】的折扣信息',
+                            title: title,
                             message: v.title,
                             iconUrl: v.img,
                             buttons: [{
@@ -302,18 +309,28 @@ chrome.notifications.onButtonClicked.addListener(function(id, i) {
 /**
  * 判断是否是关键词
  * @param  {String} q 查询的query
+ * @param {String} mallname 商城名称
  * @return {string}   返回查询到的关键字
  */
-function searchKeywords(q) {
+function searchKeywords(q, mallname) {
     var kw = keywords;
     if (kw.length === 0) {
         return false;
     }
     for (var i = 0, len = kw.length; i < len; i++) {
         var v = kw[i];
-        if (q.indexOf(v) !== -1) {
-            return v;
+        var t = v.split('+');
+        if (t.length === 2) {
+            //说明需要判断是否是商城名称
+            if (q.indexOf(t[0]) !== -1 && mallname.indexOf(t[1].trim()) !== -1) {
+                return v;
+            }
+        } else {
+            if (q.indexOf(v) !== -1) {
+                return v;
+            }
         }
+
     }
     return false;
 }

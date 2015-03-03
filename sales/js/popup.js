@@ -80,8 +80,8 @@ $(function() {
                 } catch (e) {}
             }
         }
-        $loadmore.show();
         $loading.hide();
+        $loadmore.show();
     }
 
     try {
