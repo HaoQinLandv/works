@@ -14,7 +14,7 @@ var uglify = require('gulp-uglify'),
     minifyCSS = require('gulp-minify-css');
 var imagemin = require('gulp-imagemin'),
     pngcrush = require('imagemin-pngcrush');
-
+//过滤器，处理
 var jsFilter = filter(function(file) {
         return !/_.*\.js$/.test(file.path);
     }),
@@ -24,6 +24,7 @@ var jsFilter = filter(function(file) {
     cssFilter = filter(function(file) {
         return !/\.min\.css$/.test(file.path);
     });
+//需要复制的目录和文件
 var copyFiles = ['font/**', 'sound/**'];
 //目录结构
 var dest = './dest',
@@ -36,7 +37,7 @@ var Dest = {
 Object.keys(Dest).forEach(function(k) {
     Dest[k] = dest + '/' + Dest[k];
 });
-//
+//source来源
 var Path = {
     sass: 'sass/*.scss',
     css: 'css/*.css',
@@ -58,7 +59,7 @@ gulp.task('clean', function() {
         }));
 });
 
-//compass
+//compass任务
 gulp.task('sass', function() {
 
     return gulp.src(Path.sass)
@@ -88,7 +89,7 @@ gulp.task('html', function() {
         .pipe(gutil.env.type === 'prod' ? minifyHtml() : gutil.noop())
         .pipe(gulp.dest(dest));
 });
-
+//js压缩和include任务
 gulp.task('js', function() {
     return gulp.src(Path.js)
         .pipe(plumber())
@@ -100,13 +101,14 @@ gulp.task('js', function() {
         .pipe(gulp.dest(dest));
 });
 
+//img
 gulp.task('img', function() {
     return gulp.src(Path.img)
         .pipe(plumber())
         .pipe(imagemin())
         .pipe(gulp.dest(Dest.img));
 });
-
+//打包
 gulp.task('zip', function() {
     return gulp.src(dest + '/*.*')
         .pipe(plumber())
