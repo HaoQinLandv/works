@@ -1,4 +1,5 @@
 var gulp = require('gulp');
+var include = require('gulp-include');
 var pkg = require('./package');
 var plumber = require('gulp-plumber');
 var zip = require('gulp-zip');
@@ -15,6 +16,9 @@ var imagemin = require('gulp-imagemin'),
     pngcrush = require('imagemin-pngcrush');
 
 var jsFilter = filter(function(file) {
+        return !/_.*\.js$/.test(file.path);
+    }),
+    uglifyFilter = filter(function(file) {
         return !/\.min\.js$/.test(file.path);
     }),
     cssFilter = filter(function(file) {
@@ -89,8 +93,10 @@ gulp.task('js', function() {
     return gulp.src(Path.js)
         .pipe(plumber())
         .pipe(jsFilter)
+        .pipe(include())
+        .pipe(uglifyFilter)
         .pipe(gutil.env.type === 'prod' ? uglify() : gutil.noop())
-        .pipe(jsFilter.restore())
+        .pipe(uglifyFilter.restore())
         .pipe(gulp.dest(dest));
 });
 

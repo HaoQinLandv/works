@@ -2,7 +2,7 @@ node_modules
 .sass-cache
 .idea
 build
-dist
+dest
 npm-debug.log
 
-
+*.zip
