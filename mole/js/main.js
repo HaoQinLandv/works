@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 (function(window, document, $) {
     window.random = function(min, max) {
         return (Math.random() * (max - min + 1) + min) | 0;
@@ -413,6 +414,21 @@
         }
         requestAnimationFrame(update);
         stage.update();
+=======
+(function(window, document) {
+    var $canvas;
+
+    function $(id) {
+        return document.getElementById(id);
+    }
+
+    function init() {
+        $canvas = $('c');
+        $canvas.width = 320;
+        $canvas.height = 400;
+        var stage = new Stage('c', $canvas.width, $canvas.height);
+
+>>>>>>> Stashed changes
     }
 
     window.onload = init;
