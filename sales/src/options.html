@@ -1,41 +1,11 @@
-<!doctype html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>设置-特价商品实时推送</title>
-    <link rel="stylesheet" type="text/css" href="css/bootmetro.min.css">
-    <link rel="stylesheet" type="text/css" href="css/bootmetro-responsive.min.css">
-    <link rel="stylesheet" type="text/css" href="css/bootmetro-icons.min.css">
-    <link rel="stylesheet" type="text/css" href="css/bootmetro-ui-light.min.css">
-    <link rel="stylesheet" type="text/css" href="css/switchery.min.css">
-    <link rel="stylesheet" href="css/options.css">
-    <script src="js/jquery.js"></script>
-    <script type="text/javascript" src="js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="js/bootmetro-panorama.min.js"></script>
-    <script type="text/javascript" src="js/bootmetro-pivot.min.js"></script>
-    <script type="text/javascript" src="js/bootmetro-charms.min.js"></script>
-    <script src="js/switchery.min.js"></script>
-    <script src="js/options.js"></script>
-</head>
-<body>
-<div class="navbar">
-  <div class="navbar-inner">
-     <div class="container">
-        <a class="brand" href="###">特价商品实时推送</a>
-        <div class="nav-collapse collapse navbar-responsive-collapse">
-           <ul class="nav">
-              <li class="active"><a href="###">设置</a></li>
-              <li><a href="aio.html">查看全部特价</a></li>
-              <li><a href="query.html">查看订阅消息</a></li>
-              <li class=""><a href="help.html">查看帮助</a></li>
-           </ul>
-           <ul class="nav pull-right">
-              <li><a href="###" data-toggle="modal" data-target="#J-about">关于本插件</a></li>
-           </ul>
-        </div>
-     </div>
-  </div>
-</div>
+<%- include('tpl/header', {
+   title:'设置',
+   css:['options'],
+   js:['options']
+}); %>
+
+<%- include('tpl/navbar', {activeNav:'options'})%>
+
 <div class="body-wrapper">
     <div class="setting-box">
         <h1 class="title" style="margin-bottom:40px;"><span>消息设置</span><i class=" icon-volume"></i></h1>
@@ -126,54 +96,5 @@
     </div>
 </div>
 
-<div id="J-about" class="modal hide fade in" >
-  <div class="modal-header">
-     <button type="button" class="close" data-dismiss="modal"></button>
-     <h3 id="myModalLabel">感谢使用本插件！</h3>
-  </div>
-  <div class="modal-body">
-     <ul class="nav nav-tabs" id="J-model-tab">
-         <li class="active"><a href="#J-ver-box">当前版本</a></li>
-         <li><a href="#J-bug">报告问题</a></li>
-       </ul>
+<%- include('tpl/footer')%>
 
-       <div class="tab-content">
-         <div id="J-ver-box" class="tab-pane active">
-             <p id="J-version"></p>
-             <div>
-                <button class="btn btn-success" id="J-update-btn" data-loading-text="检查中...">检查更新</button>
-                <span id="J-update-info"></span>
-             </div>
-         </div>
-         <div class="tab-pane" id="J-bug">
-             <div class="form-horizontal">
-                  <div class="control-group">
-                     <label class="control-label" for="J-mybug">问题描述</label>
-                     <div class="controls">
-                        <textarea rows="3" id="J-mybug"></textarea>
-                     </div>
-                  </div>
-                  <div class="control-group">
-                     <label class="control-label" for="J-email">Email</label>
-                     <div class="controls">
-                        <input type="text" id="J-email" placeholder="您的Email地址">
-                     </div>
-                  </div>
-                  <div class="control-group">
-                     <div class="controls">
-                        <button id="J-send-mail" type="submit" class="btn" data-loading-text="发送中...">发送</button>
-                     </div>
-                  </div>
-               </div>
-         </div>
-       </div>
-
-  </div>
-  <div class="modal-footer">
-     <button class="btn" data-dismiss="modal">关闭</button>
-     <button id="J-like" class="btn btn-success" data-link="https://chrome.google.com/webstore/detail/fencnigkojiegaifcngopoenckcgbcoo">我喜欢这个插件，我要去Chrome商店给好评</button>
-  </div>
-</div>
-
-</body>
-</html>

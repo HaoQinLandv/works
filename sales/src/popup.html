@@ -44,16 +44,16 @@
     </div>
 <script id="J-template" style="display:none" type="text/template">
     <div class="item">
-        <h4><%= title %></h4>
+        <h4>{{ title }}</h4>
         <div class="thumbnail">
-            <img src="<%= img %>" alt="<%= title %>">
+            <img src="{{ img }}" alt="{{ title }}">
         </div>
         <div class="info">
-            <p class="J-desc desc clearfix" title="点击查看更多"><%= detail %><span class="J-more"><%= more %></span></p>
+            <p class="J-desc desc clearfix" title="点击查看更多">{{ detail }}<span class="J-more">{{ more }}</span></p>
             <div class="links row">
-                <p class="footer col-md-9 fl"><span class="mallname"><%= mallname %></span><span class="source-box"><%=time%>前从<span class="source"><%= source %></span>同步</span></p>
-                <button data-link="<%= url %>" class="col-md-3 fl btn buy btn-success">立即购买</button>
-                <!--a href="<%= url %>" class="col-md-6 fl btn more btn-success">查看详情</a-->
+                <p class="footer col-md-9 fl"><span class="mallname">{{ mallname }}</span><span class="source-box">{{time}}前从<span class="source">{{ source }}</span>同步</span></p>
+                <button data-link="{{ url }}" class="col-md-3 fl btn buy btn-success">立即购买</button>
+                <!--a href="{{ url }}" class="col-md-6 fl btn more btn-success">查看详情</a-->
             </div>
         </div>
     </div>

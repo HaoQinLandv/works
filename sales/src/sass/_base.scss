@@ -24,3 +24,18 @@ $experimental-support-for-khtml: false !default;
   background-color: #48ae78;
   color: white;
 }
+
+#J-top{
+    position: fixed;
+    right: 15px;
+    bottom: 15px;
+    float: left;
+    padding: 7px 15px;
+    font-weight: 500;
+    color: #999;
+    background-color: #eee;
+    display: none;
+    &:hover{
+        text-decoration: none;
+    }
+}

@@ -27,20 +27,7 @@
     }
 
 }
-#J-top{
-    position: fixed;
-    right: 15px;
-    bottom: 15px;
-    float: left;
-    padding: 7px 15px;
-    font-weight: 500;
-    color: #999;
-    background-color: #eee;
-    display: none;
-    &:hover{
-        text-decoration: none;
-    }
-}
+
 .item:nth-child(odd){
     background-color: #f7f7f7;
 }
