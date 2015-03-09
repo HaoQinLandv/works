@@ -1,5 +1,5 @@
-var ls = window.localStorage;
-var VERSION = chrome.runtime.getManifest().version;
+//= include _tpl.js
+//= include _config.js
 //关键词
 var keywords = ls.keywords ? ls.keywords : '[]';
 try {
@@ -77,7 +77,7 @@ $(function() {
         $loading.show();
         $info.hide();
 
-        xhr = $.getJSON('http://zhufu.sinaapp.com/api/search.php?v=' + VERSION + '&q=' + encodeURIComponent(q) + '&page=' + page).done(function(json) {
+        xhr = $.getJSON(API + '/search.php?v=' + VERSION + '&q=' + encodeURIComponent(q) + '&page=' + page).done(function(json) {
             if (json && json.errno === 0) {
                 var html = '';
                 json.data.forEach(function(v) {
@@ -108,6 +108,9 @@ $(function() {
             }
 
             $loading.hide();
+        }).fail(function() {
+            $loadmore.hide();
+            $info.html('网络不畅，请稍后再试！').show();
         });
     }
 
@@ -121,18 +124,16 @@ $(function() {
             keypress();
         }
     });
-    function keypress(){
+
+    function keypress() {
         var q = $.trim($('#J-keyword').val());
-        if(q.length!==0){
+        if (q.length !== 0) {
             $('#J-query-q').find('li.active').removeClass('active');
             $content.empty();
             getData(q, 1);
 
-        }else{
+        } else {
             $('#J-keyword').focus();
         }
     }
 });
-
-//= include _tpl.js
-

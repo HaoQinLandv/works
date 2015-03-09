@@ -1,18 +1,16 @@
-.mr5{
-    margin-right: 5px;
-}
-
-.mt5{
-    margin-right: 5px;
-}
+@import 'item';
 
 #J-nav{
     .btn.btn-nav{
         border: 1px solid #ddd;
         background-color: white;
+        font-weight: normal;
         &:hover{
             background-color: #eee;
         }
+    }
+    .btn.btn-success{
+        font-weight: bold;
     }
     .tnav{
         margin-bottom: 10px;
