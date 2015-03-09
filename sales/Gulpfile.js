@@ -6,24 +6,14 @@ var zip = require('gulp-zip');
 var replace = require('gulp-replace');
 var rimraf = require('gulp-rimraf');
 var gutil = require('gulp-util');
-var filter = require('gulp-filter');
+
+var gIf = require('gulp-if');
 var ejs = require('gulp-ejs'),
     minifyHtml = require('gulp-minify-html');
 var uglify = require('gulp-uglify'),
     compass = require('gulp-compass'),
     minifyCSS = require('gulp-minify-css');
-var imagemin = require('gulp-imagemin'),
-    pngcrush = require('imagemin-pngcrush');
-//过滤器，处理
-var jsFilter = filter(function(file) {
-        return !/_.*\.js$/.test(file.path);
-    }),
-    uglifyFilter = filter(function(file) {
-        return !/\.min\.js$/.test(file.path);
-    }),
-    cssFilter = filter(function(file) {
-        return !/\.min\.css$/.test(file.path);
-    });
+
 //需要复制的目录和文件
 var copyFiles = ['font/**', 'sound/**'];
 //目录结构
@@ -42,11 +32,15 @@ var Path = {
     sass: 'sass/*.scss',
     css: 'css/*.css',
     img: 'img/**/*',
-    js: '**/*.js',
+    js: ['**/*.js', '!**/_*.js'],
     html: '*.html'
 };
 Object.keys(Path).forEach(function(k) {
-    Path[k] = src + '/' + Path[k];
+    if (Array.isArray(Path[k])) {
+        Path[k].forEach(function(v, i) {
+            Path[k][i] = src + '/' + Path[k][i];
+        });
+    }
 });
 //清理
 gulp.task('clean', function() {
@@ -75,9 +69,7 @@ gulp.task('sass', function() {
 gulp.task('css', function() {
     return gulp.src(Path.css)
         .pipe(plumber())
-        .pipe(cssFilter)
-        .pipe(gutil.env.type === 'prod' ? minifyCSS() : gutil.noop())
-        .pipe(cssFilter.restore())
+        .pipe(gIf('!*.min.css', gutil.env.type === 'prod' ? minifyCSS() : gutil.noop()))
         .pipe(gulp.dest(Dest.css));
 });
 
@@ -93,11 +85,8 @@ gulp.task('html', function() {
 gulp.task('js', function() {
     return gulp.src(Path.js)
         .pipe(plumber())
-        .pipe(jsFilter)
         .pipe(include())
-        .pipe(uglifyFilter)
-        .pipe(gutil.env.type === 'prod' ? uglify() : gutil.noop())
-        .pipe(uglifyFilter.restore())
+        .pipe(gIf('!*.min.js', gutil.env.type === 'prod' ? uglify() : gutil.noop()))
         .pipe(gulp.dest(dest));
 });
 
@@ -105,7 +94,7 @@ gulp.task('js', function() {
 gulp.task('img', function() {
     return gulp.src(Path.img)
         .pipe(plumber())
-        .pipe(imagemin())
+        // .pipe(imagemin())
         .pipe(gulp.dest(Dest.img));
 });
 //打包
@@ -117,7 +106,7 @@ gulp.task('zip', function() {
 });
 
 //default
-gulp.task('default', ['sass', 'css', 'js', 'html', 'img'], function() {
+gulp.task('default', ['sass', 'css', 'js', 'html'], function() {
     copyFiles.forEach(function(v) {
         if (v) {
             gulp.src(src + '/' + v)
@@ -137,9 +126,12 @@ gulp.task('build', ['clean', 'default', 'zip']);
 //watcher
 gulp.task('watch', function() {
 
-    ['css', 'js', 'img', 'sass', 'html'].forEach(function(v) {
+    ['css', 'js', 'sass', 'html'].forEach(function(v) {
         if (Path[v]) {
-            gulp.watch(Path[v], [v]);
+            var watcher = gulp.watch(Path[v], [v]);
+            watcher.on('change', function(event) {
+                console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
+            });
         }
     });
     gulp.watch(src + '/tpl/**', ['html'])
