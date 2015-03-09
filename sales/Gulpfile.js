@@ -40,6 +40,8 @@ Object.keys(Path).forEach(function(k) {
         Path[k].forEach(function(v, i) {
             Path[k][i] = src + '/' + Path[k][i];
         });
+    } else {
+        Path[k] = src + '/' + Path[k];
     }
 });
 //清理
@@ -128,10 +130,8 @@ gulp.task('watch', function() {
 
     ['css', 'js', 'sass', 'html'].forEach(function(v) {
         if (Path[v]) {
+            // console.log(Path[v]);
             var watcher = gulp.watch(Path[v], [v]);
-            watcher.on('change', function(event) {
-                console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
-            });
         }
     });
     gulp.watch(src + '/tpl/**', ['html'])

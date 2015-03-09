@@ -16,13 +16,12 @@ a{
     .navbar-inner{
         border-width: 0 0 1px 0;
     }
+    .brand{
 
-
-.brand{
-    background: url('../img/icon64.png') no-repeat 10px center;
-    background-size: 26px auto;
-    padding-left: 44px;
-}
+        background: url('../img/icon64.png') no-repeat 10px center;
+        background-size: 26px auto;
+        padding-left: 44px;
+    }
 }
 .body-wrapper{
     width: 940px;
