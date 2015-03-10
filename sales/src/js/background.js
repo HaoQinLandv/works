@@ -186,7 +186,7 @@ function checkKeyWordNotice() {
                             iconUrl: v.img,
                             buttons: [{
                                 title: '立即去抢购 >>',
-                                iconUrl: '../icon64.png'
+                                iconUrl: 'img/icon64.png'
                             }, {
                                 title: '设置消息提醒 >>',
                                 iconUrl: 'img/options.png'
@@ -217,7 +217,7 @@ function checkKeyWordNotice() {
                             iconUrl: v.img,
                             buttons: [{
                                 title: '立即去抢购 >>',
-                                iconUrl: '../icon64.png'
+                                iconUrl: 'img/icon64.png'
                             }, {
                                 title: '设置消息提醒 >>',
                                 iconUrl: 'img/options.png'
@@ -294,7 +294,7 @@ chrome.notifications.onButtonClicked.addListener(function(id, i) {
             });
         }
 
-    } else if (id.indexOf('install_') === 0) {
+    } else if (id.indexOf('install_') === 0 || id.indexOf('update_notify_') === 0) {
         if (i === 0) {
             chrome.tabs.create({
                 url: 'options.html'
@@ -353,7 +353,7 @@ chrome.runtime.onInstalled.addListener(function(details) {
         type: 'basic',
         title: '折扣商品实时推送更新了！',
         message: '当前版本：v' + version,
-        iconUrl: 'icon128.png'
+        iconUrl: 'img/icon128.png'
     };
     if (details.reason === 'install') {
         opt.title = '您已经安装成功【折扣商品实时推送】';
@@ -364,9 +364,18 @@ chrome.runtime.onInstalled.addListener(function(details) {
             title: '查看帮助 >>',
             iconUrl: 'img/question.png'
         }];
+
         chrome.notifications.create('install_' + (+new Date()), opt, function() {});
     } else if (details.reason === 'update') {
         version = chrome.runtime.getManifest().version;
-        // chrome.notifications.create('update_notify' + (+new Date()), opt, function() {});
+        opt.message += '\n1. 增加全部特价商品\n2. 增加定制高级关键词';
+        opt.buttons = [{
+            title: '设置 >>',
+            iconUrl: 'img/options.png'
+        }, {
+            title: '查看帮助 >>',
+            iconUrl: 'img/question.png'
+        }];
+        chrome.notifications.create('update_notify_' + (+new Date()), opt, function() {});
     }
 });

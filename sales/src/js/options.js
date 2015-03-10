@@ -48,7 +48,7 @@ $(function() {
             iconUrl: '../img/test.jpg',
             buttons: [{
                 title: '立即去抢购>>',
-                iconUrl: '../icon64.png'
+                iconUrl: '../img/icon64.png'
             }]
         }, function() {});
     });

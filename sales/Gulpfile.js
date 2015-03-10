@@ -65,7 +65,6 @@ gulp.task('sass', function() {
             sass: src + '/sass',
             css: dest + '/css'
         }))
-        .pipe(gutil.env.type === 'prod' ? minifyCSS() : gutil.noop())
         .pipe(gulp.dest(Dest.css));
 });
 gulp.task('css', function() {
@@ -99,16 +98,11 @@ gulp.task('img', function() {
         // .pipe(imagemin())
         .pipe(gulp.dest(Dest.img));
 });
-//打包
-gulp.task('zip', function() {
-    return gulp.src(dest + '/*.*')
-        .pipe(plumber())
-        .pipe(zip('aio.zip'))
-        .pipe(gulp.dest('.'));
-});
+
+
 
 //default
-gulp.task('default', ['sass', 'css', 'js', 'html'], function() {
+gulp.task('default', ['sass', 'css', 'js', 'html', 'img'], function() {
     copyFiles.forEach(function(v) {
         if (v) {
             gulp.src(src + '/' + v)
@@ -122,7 +116,13 @@ gulp.task('default', ['sass', 'css', 'js', 'html'], function() {
         .pipe(gulp.dest(dest));
 
 });
-gulp.task('build', ['clean', 'default', 'zip']);
+gulp.task('build', ['default'], function() {
+    //打包
+    gulp.src(dest + '/**')
+        .pipe(plumber())
+        .pipe(zip('aio.zip'))
+        .pipe(gulp.dest('.'));
+});
 //gulp build --type prod
 
 //watcher
