@@ -9,7 +9,8 @@ $(function() {
 
     var Template = $('#J-template').html();
     var $content = $('#J-content');
-    var $loadmore = $('#J-loadmore').click(function() {
+    var $loadmore = $('#J-loadmore');
+    $('#J-loadBtn').click(function() {
         $loadmore.hide();
         $loading.show();
         $.getJSON(API.list + PAGE).done(append);

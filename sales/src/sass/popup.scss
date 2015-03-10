@@ -147,19 +147,22 @@ body{
 }
 
 .loadmore{
-    margin-right: 50%;
-    margin-bottom: 10px;
-}
-.loadmore .btn{
-    width: 126px;
-    margin-left: 117px;
-    float: left;
-    background-color: #bbb;
-    padding: 5px 10px;
-    &:hover{
-        background-color: #888;
+    margin: 0 34px 10px;
+
+    .btn{
+        width: 126px;
+        float: left;
+        background-color: #bbb;
+        padding: 5px 10px;
+        &:hover{
+            background-color: #888;
+        }
+    }
+    .btn.btn-info{
+        background-color: #49afcd;
     }
 }
+
 .loading {
     display: block;
     width: 200px;
