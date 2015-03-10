@@ -2,7 +2,7 @@
 //= include _config.js
 
 var CATE = ss ? ss.cates : '{}';
-var pager = {};
+
 
 try {
     CATE = JSON.parse(CATE);
@@ -11,9 +11,10 @@ try {
 }
 if (!CATE || !CATE.malls) {
     $.getJSON(APIURL + '/getCateArray.php?v=' + VERSION, function(json) {
-        if (json.errno === 0) {
+        if (json.errno === 0 && json.data) {
             CATE = json.data;
             ss.cates = JSON.stringify(CATE);
+            nav(CATE);
         }
     });
 }
@@ -21,7 +22,7 @@ if (!CATE || !CATE.malls) {
 
 function init() {
     //添加导航
-    nav(CATE);
+    CATE && nav(CATE);
     //返回顶部
     back2Top();
     //主要函数
@@ -59,6 +60,7 @@ function nav(data) {
 function main() {
     var curMall = 'all',
         curCate = 'all';
+    var pager = 1;
     var $nav = $('#J-nav').delegate('button[data-type]', 'click', function() {
         var $t = $(this),
             type = $t.data('type'),
@@ -71,10 +73,11 @@ function main() {
                 curCate = q;
                 break;
         }
-        $t.parent().find('btn-success').removeClass('btn-success');
+        $t.parent().find('.btn-success').removeClass('btn-success');
         $t.addClass('btn-success');
 
-        tabChange();
+        $content.empty();
+        loadData(curMall, curCate, 1);
     });
 
     var $info = $('#J-info');
@@ -82,7 +85,7 @@ function main() {
     var $loadmore = $('#J-loadmore').click(function() {
         $loadmore.hide();
         $loading.show();
-        loadData(curCate, curMall, ++pager[getId()]);
+        loadData(curMall, curCate, ++pager);
     });
     var $loading = $('#J-loading');
     var $content = $('#J-content').delegate('button[data-link]', 'click', function() {
@@ -92,14 +95,6 @@ function main() {
         });
     });
 
-    function tabChange() {
-        var $container = $('#J-' + getId());
-        if ($container[0] && $container.html() !== '') {
-            $container.show();
-        } else {
-            loadData(curMall, curCate, 0);
-        }
-    }
 
     function getId() {
         return [curMall, curCate].join('-');
@@ -109,13 +104,10 @@ function main() {
     function loadData(mall, cate, p) {
         p = p || 1;
         mall = mall || 'all';
-        cate = mall || 'all';
-        if (mall === 'all') {
-            var _mall = '';
-        }
-        if (cate === 'all') {
-            var _cate = '';
-        }
+        cate = cate || 'all';
+        var _mall = encodeURIComponent(mall === 'all' ? '' : mall);
+        var _cate = encodeURIComponent(cate === 'all' ? '' : cate);
+
         xhr && xhr.abort();
         $loadmore.hide();
         $loading.show();
@@ -127,16 +119,14 @@ function main() {
                     json.data.forEach(function(v) {
                         html += TPL(Template, v);
                     });
-                    var $container = $('#J-' + getId());
-                    if (!$container[0]) {
-                        $container = $('<div id="' + getId() + '"></div>');
-                        $container.html(html);
-                        $content.append($container);
+
+                    if (p === 0 || p === 1) {
+                        $content.html(html);
                     } else {
-                        $container.append(html);
+                        $content.append(html);
                     }
 
-                    pager[getId()] = p;
+                    pager = p;
                     if (json.data.length < 30) {
                         $info.html('没有更多特价商品了').show();
                         $loadmore.hide();

@@ -4,3 +4,16 @@ function TPL(html, data) {
     }
     return html;
 }
+
+function urlQuery() {
+    if (location.search) {
+        var q = decodeURIComponent(location.search.substr(1));
+        var obj = {};
+        q.split('&').forEach(function(v) {
+            var t = v.split('=');
+            obj[t[0]] = t[1];
+        });
+        return obj;
+    }
+    return {};
+}

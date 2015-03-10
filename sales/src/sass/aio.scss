@@ -1,7 +1,7 @@
 @import 'item';
 
 #J-nav{
-    .btn.btn-nav{
+    .btn{
         border: 1px solid #ddd;
         background-color: white;
         font-weight: normal;
@@ -11,6 +11,8 @@
     }
     .btn.btn-success{
         font-weight: bold;
+        background-color: #5bb75b;
+        border-color: #5bb75b;
     }
     .tnav{
         margin-bottom: 10px;

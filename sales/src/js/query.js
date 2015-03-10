@@ -11,6 +11,12 @@ try {
 $(function() {
     var pager = {};
     var curKeyword;
+    var query = urlQuery();
+    if (typeof query.q === 'string' && $.trim(query.q).length > 1) {
+        curKeyword = $.trim(query.q);
+        keywords.unshift(curKeyword);
+    }
+
     var $info = $('#J-info');
     var Template = $('#J-template').html();
     var $content = $('#J-content').delegate('button[data-link]', 'click', function() {
@@ -43,6 +49,8 @@ $(function() {
         html += '<li><a href="###">' + v + '</a></li>';
     });
     $list.html(html).find(':first').addClass('active');
+
+
     if (keywords.length && keywords[0] !== '') {
         curKeyword = keywords[0];
         getData(keywords[0], 1);
@@ -76,8 +84,14 @@ $(function() {
         $loadmore.hide();
         $loading.show();
         $info.hide();
-
-        xhr = $.getJSON(API + '/search.php?v=' + VERSION + '&q=' + encodeURIComponent(q) + '&page=' + page).done(function(json) {
+        if (q.indexOf('+') !== -1) {
+            q = q.split('+');
+        }
+        var url = APIURL + '/search.php?v=' + VERSION + '&q=' + encodeURIComponent(q[0]);
+        if (q[1]) {
+            url += '&mallname=' + encodeURIComponent(q[1]);
+        }
+        xhr = $.getJSON(url + '&page=' + page).done(function(json) {
             if (json && json.errno === 0) {
                 var html = '';
                 json.data.forEach(function(v) {

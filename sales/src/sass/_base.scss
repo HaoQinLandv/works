@@ -46,3 +46,13 @@ $experimental-support-for-khtml: false !default;
     margin-right: 5px;
 }
 
+.input-append .add-on:last-child, .input-append .btn:last-child,
+.control-group.success input, .control-group.success select, .control-group.success textarea{
+    border: 2px solid #5bb75b;
+}
+
+.navbar-search .input-append .add-on:last-child,
+.navbar-search .input-append .btn:last-child,
+.navbar-search .control-group.success input{
+    border: 2px solid #ccc;
+}
