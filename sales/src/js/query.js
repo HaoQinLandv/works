@@ -86,6 +86,8 @@ $(function() {
         $info.hide();
         if (q.indexOf('+') !== -1) {
             q = q.split('+');
+        } else {
+            q = [q];
         }
         var url = APIURL + '/search.php?v=' + VERSION + '&q=' + encodeURIComponent(q[0]);
         if (q[1]) {
