@@ -131,7 +131,7 @@ $(function() {
         var html = '';
 
         keywords.forEach(function(v) {
-            html += '<span class="label ' + getRandomLabelClass() + '">' + v + '<span class="J-close icon-close"></span></span>';
+            html += '<span class="label ' + getRandomLabelClass() + '"><a class="J-dkw" href="query.html?q='+encodeURIComponent(v)+'" target="_blank">' + v + '</a><span class="J-close icon-close"></span></span>';
         });
         $('#J-kw-con').html(html);
     }
@@ -144,6 +144,7 @@ $(function() {
         insertKeyword(kw);
     });
     $('#J-kw-con').delegate('.J-close', 'click', function(e) {
+        e.stopPropagation();
         var $t = $(this).parent();
         var kw = $.trim($t.text());
         if (keywords.indexOf(kw) !== -1) {
@@ -157,7 +158,7 @@ $(function() {
         if ($('#J-kw-con').children().length === 0) {
             $('#J-kw-con').html('<p>竟然还是空的，添加订阅关键字会帮你监控你想要的优惠信息哦</p>');
         }
-    });
+    })
 
     function keypress() {
         var kw = $.trim($('#J-keyword').val());

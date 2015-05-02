@@ -12,7 +12,7 @@ $(function() {
     var pager = {};
     var curKeyword;
     var query = urlQuery();
-    if (typeof query.q === 'string' && $.trim(query.q).length > 1) {
+    if (typeof query.q === 'string' && $.trim(query.q).length > 0) {
         curKeyword = $.trim(query.q);
         keywords.unshift(curKeyword);
     }
@@ -144,6 +144,7 @@ $(function() {
     function keypress() {
         var q = $.trim($('#J-keyword').val());
         if (q.length !== 0) {
+            curKeyword = q;
             $('#J-query-q').find('li.active').removeClass('active');
             $content.empty();
             getData(q, 1);
