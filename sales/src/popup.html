@@ -7,8 +7,11 @@
     <link rel="stylesheet" type="text/css" href="css/bootmetro-responsive.min.css">
     <link rel="stylesheet" type="text/css" href="css/bootmetro-icons.min.css">
     <link rel="stylesheet" type="text/css" href="css/bootmetro-ui-light.min.css">
+    <link rel="stylesheet" type="text/css" href="css/switchery.min.css">
     <link rel="stylesheet" href="css/popup.css">
+    <script src="js/switchery.min.js"></script>
     <script src="js/jquery.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
     <script src="js/popup.js"></script>
 </head>
 <body>
@@ -23,10 +26,9 @@
              <li class="active">最新特价</li>
              <li><a href="aio.html" target="_blank">查看全部</a></li>
              <li><a href="query.html" target="_blank">定制特价</a></li>
-             <li><a href="help.html" target="_blank">查看帮助</a></li>
+             <li><a href="help.html" target="_blank">帮助</a></li>
         </ul>
     </div>
-
 </div>
 
     <div id="J-all" class="container">
@@ -43,6 +45,9 @@
             <span class="loadingmoreword">加载中，请稍候...</span>
         </div>
     </div>
+<footer>
+    <div class="rt mr5"><span class="label label-info mr5" data-toggle="tooltip" data-original-title="打开后不会出现弹窗">勿扰模式</span><input data-lsid="openNotice" id="J-notice-btn" type="checkbox" class="J-switch" checked /></div>
+</footer>
 <script id="J-template" style="display:none" type="text/template">
     <div class="item">
         <h4>{{ title }}</h4>

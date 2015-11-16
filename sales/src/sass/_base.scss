@@ -8,17 +8,17 @@ $experimental-support-for-khtml: false !default;
 @import "compass/css3";
 
 ::-webkit-scrollbar {
-  width: 12px;
+  width: 8px;
   height: 12px;
 }
 ::-webkit-scrollbar-thumb {
   box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.5);
-  border-radius: 5px;
+  border-radius: 4px;
   background: rgba(0, 0, 0, 0.25);
 }
 ::-webkit-scrollbar-track {
   box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.3);
-  border-radius: 5px;
+  border-radius: 4px;
 }
 ::selection {
   background-color: #48ae78;
@@ -45,7 +45,22 @@ $experimental-support-for-khtml: false !default;
 .mr5{
     margin-right: 5px;
 }
+@keyframes flash {
+  from, 50%, to {
+    opacity: 1;
+  }
 
+  25%, 75% {
+    opacity: 0;
+  }
+}
+.ani-flash{
+    color: red;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    animation-name: flash;
+    animation-timing-function: ease-in-out;
+}
 .input-append .add-on:last-child, .input-append .btn:last-child,
 .control-group.success input, .control-group.success select, .control-group.success textarea{
     border: 2px solid #5bb75b;
@@ -66,4 +81,8 @@ $experimental-support-for-khtml: false !default;
   &:after {
     clear: both;
   }
+}
+#J-changelog{
+  height: 130px;
+  overflow-y: auto;
 }

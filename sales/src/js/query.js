@@ -8,7 +8,7 @@ try {
     keywords = [];
     ls.keywords = '[]';
 }
-$(function() {
+$(function () {
     var pager = {};
     var curKeyword;
     var query = urlQuery();
@@ -19,13 +19,14 @@ $(function() {
 
     var $info = $('#J-info');
     var Template = $('#J-template').html();
-    var $content = $('#J-content').delegate('button[data-link]', 'click', function() {
+    var $content = $('#J-content').delegate('button[data-link]', 'click', function () {
         var url = $(this).data('link');
         chrome.tabs.create({
-            url: url
+            url: url,
+            selected: false
         });
     });
-    var $loadmore = $('#J-loadmore').click(function() {
+    var $loadmore = $('#J-loadmore').click(function () {
         $loadmore.hide();
         $loading.show();
 
@@ -34,7 +35,7 @@ $(function() {
         }
     });
     var $loading = $('#J-loading');
-    var $list = $('#J-query-q').delegate('a', 'click', function() {
+    var $list = $('#J-query-q').delegate('a', 'click', function () {
         var $t = $(this);
         var q = $.trim($t.text());
         $('#J-query-q').find('li.active').removeClass('active');
@@ -45,7 +46,7 @@ $(function() {
         getData(q, pager[q]);
     });
     var html = '';
-    keywords.forEach(function(v) {
+    keywords.forEach(function (v) {
         html += '<li><a href="###">' + v + '</a></li>';
     });
     $list.html(html).find(':first').addClass('active');
@@ -60,15 +61,15 @@ $(function() {
         $info.hide();
         $('#J-empty-info').fadeIn();
     }
-    $('#J-top').click(function() {
+    $('#J-top').click(function () {
         $('body').animate({
             scrollTop: 0
         }, 'fast');
     });
     var timer;
-    $(window).scroll(function() {
+    $(window).scroll(function () {
         timer && clearTimeout(timer);
-        timer = setTimeout(function() {
+        timer = setTimeout(function () {
             var t = $(window).scrollTop();
             if (t > 100) {
                 $('#J-top').show();
@@ -84,6 +85,7 @@ $(function() {
         $loadmore.hide();
         $loading.show();
         $info.hide();
+        $('#J-empty-info').hide();
         if (q.indexOf('+') !== -1) {
             q = q.split('+');
         } else {
@@ -93,10 +95,10 @@ $(function() {
         if (q[1]) {
             url += '&mallname=' + encodeURIComponent(q[1]);
         }
-        xhr = $.getJSON(url + '&page=' + page).done(function(json) {
+        xhr = $.getJSON(url + '&page=' + page).done(function (json) {
             if (json && json.errno === 0) {
                 var html = '';
-                json.data.forEach(function(v) {
+                json.data.forEach(function (v) {
                     v.title = v.title.replace(new RegExp(q, 'g'), '<span class="key">' + q + '</span>');
                     v.detail = v.detail.replace(new RegExp(q, 'g'), '<span class="key">' + q + '</span>');
                     html += TPL(Template, v);
@@ -113,7 +115,6 @@ $(function() {
                 } else {
                     $info.hide();
                     $loadmore.show();
-
                 }
             } else if (json.errno === 1) {
                 $loadmore.hide();
@@ -124,18 +125,18 @@ $(function() {
             }
 
             $loading.hide();
-        }).fail(function() {
+        }).fail(function () {
             $loadmore.hide();
             $info.html('网络不畅，请稍后再试！').show();
         });
     }
 
 
-    $('#J-keyword-submit').unbind().click(function() {
+    $('#J-keyword-submit').unbind().click(function () {
         keypress();
         return false;
     });
-    $('#J-keyword').unbind().keypress(function(e) {
+    $('#J-keyword').unbind().keypress(function (e) {
         if (e.keyCode === 13) {
             keypress();
         }

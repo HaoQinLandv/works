@@ -1,5 +1,5 @@
-var ls = window.localStorage;
-var ss = window.sessionStorage;
+//= include _tpl.js
+//= include _config.js
 var ID = (+new Date());
 var VERSION = chrome.runtime.getManifest().version;
 // var MAX_NOTIFY = 6;
@@ -37,7 +37,7 @@ settings = $.extend({
     openNotice: true
 }, settings);
 
-var emptyFn = function() {};
+var emptyFn = function () {};
 var feedTimer, noticeTimer;
 var feedInterval = 113000;
 var noticeInterval = 113000;
@@ -61,7 +61,7 @@ feedTimer = setInterval(checkNewFeed, feedInterval);
 
 function checkNewFeed() {
     var curmaxidloop = ls.maxCnDealId ? ls.maxCnDealId : 0;
-    $.get('http://zhufu.sinaapp.com/api/newfeed.php?v=' + VERSION + '&id=' + curmaxidloop, function(data) {
+    $.get(APIURL + '/newfeed.php?v=' + VERSION + '&id=' + curmaxidloop, function (data) {
         if (data > 99) {
             //不再更新
             clearInterval(feedTimer);
@@ -90,7 +90,7 @@ function checkNewFeed() {
 }
 
 
-chrome.runtime.onMessage.addListener(function(obj, sender, callback) {
+chrome.runtime.onMessage.addListener(function (obj, sender, callback) {
     switch (obj.action) {
         case 'startFeedTimer':
             //如果收到popup的消息，并且通知类型是显示数字
@@ -157,13 +157,13 @@ function checkKeyWordNotice() {
             MAX_NOTIFY = 3;
         }
     }
-    $.getJSON('http://zhufu.sinaapp.com/api/getdata.php?v=' + VERSION + '&t=' + (+new Date()) + '&page=1&maxnotifyid=' + maxnotifyid, function(json) {
+    $.getJSON(APIURL + '/getdata.php?v=' + VERSION + '&t=' + (+new Date()) + '&page=1&maxnotifyid=' + maxnotifyid, function (json) {
         if (json.errno === 0) {
             var kw;
             ls.maxnotifyid = json.maxid;
             var play = false;
             var notifyCount = 1;
-            json.data.forEach(function(v) {
+            json.data.forEach(function (v) {
                 var id, opt;
                 var now = Date.now();
                 //订阅关键字,保证最多弹MAX_NOTIFY个
@@ -194,7 +194,7 @@ function checkKeyWordNotice() {
                         };
                         id = 'kw' + (now++);
 
-                        chrome.notifications.create(id, opt, function() {
+                        chrome.notifications.create(id, opt, function () {
                             //存入sessionStorage
                             ss[id] = JSON.stringify(v);
                             if (!play) {
@@ -209,7 +209,7 @@ function checkKeyWordNotice() {
                 if (settings.openNotice && notifyCount <= MAX_NOTIFY) {
                     var hour = new Date().getHours();
                     hour = hour | 0;
-                    var cb = function() {
+                    var cb = function () {
                         opt = {
                             type: 'basic',
                             title: v.title,
@@ -225,7 +225,7 @@ function checkKeyWordNotice() {
                         };
                         id = 'item' + (now++);
 
-                        chrome.notifications.create(id, opt, function() {
+                        chrome.notifications.create(id, opt, function () {
                             //存入sessionStorage
                             ss[id] = JSON.stringify(v);
 
@@ -259,7 +259,7 @@ function checkKeyWordNotice() {
     });
 }
 
-chrome.notifications.onClicked.addListener(function(id) {
+chrome.notifications.onClicked.addListener(function (id) {
     if (ss[id]) {
         try {
             var obj = JSON.parse(ss[id]);
@@ -274,7 +274,7 @@ chrome.notifications.onClicked.addListener(function(id) {
         }
     }
 });
-chrome.notifications.onButtonClicked.addListener(function(id, i) {
+chrome.notifications.onButtonClicked.addListener(function (id, i) {
     if (ss[id]) {
         if (i === 0) {
             try {
@@ -347,7 +347,7 @@ function playNotificationSound() {
 
 
 //监控更新
-chrome.runtime.onInstalled.addListener(function(details) {
+chrome.runtime.onInstalled.addListener(function (details) {
     var version = chrome.runtime.getManifest().version;
     var opt = {
         type: 'basic',
@@ -365,7 +365,7 @@ chrome.runtime.onInstalled.addListener(function(details) {
             iconUrl: 'img/question.png'
         }];
 
-        chrome.notifications.create('install_' + (+new Date()), opt, function() {});
+        chrome.notifications.create('install_' + (+new Date()), opt, function () {});
     } else if (details.reason === 'update') {
         version = chrome.runtime.getManifest().version;
         opt.message += '\n1. 增加全部特价商品\n2. 增加定制高级关键词';
@@ -376,6 +376,6 @@ chrome.runtime.onInstalled.addListener(function(details) {
             title: '查看帮助 >>',
             iconUrl: 'img/question.png'
         }];
-        chrome.notifications.create('update_notify_' + (+new Date()), opt, function() {});
+        chrome.notifications.create('update_notify_' + (+new Date()), opt, function () {});
     }
 });

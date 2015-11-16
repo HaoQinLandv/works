@@ -1,16 +1,17 @@
-var VERSION = chrome.runtime.getManifest().version;
+//= include _tpl.js
+//= include _config.js
 var API = {
-    list: 'http://zhufu.sinaapp.com/api/getdata.php?v=' + VERSION + '&page=',
-    maxid: 'http://zhufu.sinapp.com/api/getmaxid.php?v=' + VERSION
+    list: APIURL + '/getdata.php?v=' + VERSION + '&page=',
+    maxid: APIURL + '/getmaxid.php?v=' + VERSION
 };
-var emptyFn = function() {};
+var emptyFn = function () {};
 var FIRST = true;
-$(function() {
+$(function () {
 
     var Template = $('#J-template').html();
     var $content = $('#J-content');
     var $loadmore = $('#J-loadmore');
-    $('#J-loadBtn').click(function() {
+    $('#J-loadBtn').click(function () {
         $loadmore.hide();
         $loading.show();
         $.getJSON(API.list + PAGE).done(append);
@@ -19,10 +20,10 @@ $(function() {
 
     var PAGE = 1;
 
-    $('#J-close').click(function() {
+    $('#J-close').click(function () {
         window.close();
     });
-    $('#J-refresh').click(function() {
+    $('#J-refresh').click(function () {
         refresh();
         return false;
     });
@@ -35,11 +36,12 @@ $(function() {
         $loading.show();
         $.getJSON(API.list + PAGE).done(append);
     }
-    $content.delegate('button.buy', 'click', function() {
+    $content.delegate('button.buy', 'click', function () {
         chrome.tabs.create({
-            url: $(this).data('link')
+            url: $(this).data('link'),
+            selected: false
         });
-    }).delegate('p.J-desc', 'click', function() {
+    }).delegate('p.J-desc', 'click', function () {
         $(this).find('.J-more').toggle();
     });
 
@@ -50,7 +52,7 @@ $(function() {
             PAGE++;
             var html = '';
             // console.log(json.data);
-            json.data.forEach(function(v) {
+            json.data.forEach(function (v) {
                 var detail = v.detail;
                 v.detail = detail.slice(0, 80);
                 v.more = detail.slice(80);
@@ -84,6 +86,26 @@ $(function() {
         $loading.hide();
         $loadmore.show();
     }
+    $('[data-toggle="tooltip"]').tooltip();
+    //绑定开关事件
+    $('input[data-lsid="openNotice"]').attr('checked', !settings.openNotice);
+    $('.J-switch').change(function () {
+        var st = settings;
+        var $t = $(this);
+        var lsid = $t.data('lsid');
+        st[lsid] = !!this.checked;
+        ls.settings = JSON.stringify(st);
+        chrome.runtime.sendMessage({
+            action: 'updateSwitch',
+            id: lsid,
+            value: !this.checked
+        }, function () {});
+    }).each(function (i, v) {
+        new Switchery(v, {
+            size: 'small',
+            color: '#2d89f0'
+        });
+    });
 
     try {
         var data = sessionStorage.newData;
@@ -93,7 +115,7 @@ $(function() {
             append(data, 'from cache');
         }
     } catch (e) {
-        setTimeout(function() {
+        setTimeout(function () {
             $.getJSON(API.list + PAGE).done(append);
         }, 50);
     }

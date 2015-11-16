@@ -10,7 +10,7 @@ try {
     CATE = null;
 }
 if (!CATE || !CATE.malls) {
-    $.getJSON(APIURL + '/getCateArray.php?v=' + VERSION, function(json) {
+    $.getJSON(APIURL + '/getCateArray.php?v=' + VERSION, function (json) {
         if (json.errno === 0 && json.data) {
             CATE = json.data;
             ss.cates = JSON.stringify(CATE);
@@ -34,26 +34,32 @@ function nav(data) {
     var malls = data.malls,
         cates = data.cates;
 
-    var t = '<button class="btn mr5 btn-nav" data-type="{{type}}" data-q="{{q}}">{{name}}</button>';
-    var html = '<div class="tnav"><button class="btn mr5 btn-success" data-type="mall" data-q="all">全部</button>';
-    malls.forEach(function(v) {
+    var t = '<button class="btn mr5 btn-nav" data-type="{{type}}" data-q="{{q}}">{{name}} {{icon}}</button>';
+    var html = '<div><span class="fl">商城：</span><div class="tnav"><button class="btn mr5 btn-success" data-type="mall" data-q="all">全部</button>';
+    malls.forEach(function (v) {
+        var icon = '';
+        if (v.icon) {
+            icon = TPL('<i class="{{icon}} text-{{cls}}" ' + (v.tooltips ? 'data-toggle="tooltip" data-original-title="{{tooltips}}"' : '') + '></i>', v);
+        }
         html += TPL(t, {
             name: v.shortName,
             type: 'mall',
-            q: v.shortName
+            q: v.name,
+            icon: icon
         });
     });
-    html += '</div>';
-    html += '<div class="tnav"><button class="btn mr5 btn-success" data-type="cate" data-q="all">全部</button>';
-    cates.forEach(function(v) {
-        html += TPL(t, {
+    html += '</div></div>';
+    html += '<div><span class="fl">类别：</span><div class="tnav"><button class="btn mr5 btn-success" data-type="cate" data-q="all">全部</button>';
+    cates.forEach(function (v) {
+        html += TPL('<button class="btn mr5 btn-nav" data-type="{{type}}" data-q="{{q}}">{{name}}</button>', {
             name: v.name,
             q: v.id,
             type: 'cate'
         });
     });
-    html += '</div>';
+    html += '</div></div>';
     $nav.html(html);
+    $('[data-toggle="tooltip"]').tooltip();
 }
 
 //主要逻辑
@@ -61,7 +67,7 @@ function main() {
     var curMall = 'all',
         curCate = 'all';
     var pager = 1;
-    var $nav = $('#J-nav').delegate('button[data-type]', 'click', function() {
+    var $nav = $('#J-nav').delegate('button[data-type]', 'click', function () {
         var $t = $(this),
             type = $t.data('type'),
             q = $t.data('q');
@@ -82,16 +88,17 @@ function main() {
 
     var $info = $('#J-info');
     var Template = $('#J-template').html();
-    var $loadmore = $('#J-loadmore').click(function() {
+    var $loadmore = $('#J-loadmore').click(function () {
         $loadmore.hide();
         $loading.show();
         loadData(curMall, curCate, ++pager);
     });
     var $loading = $('#J-loading');
-    var $content = $('#J-content').delegate('button[data-link]', 'click', function() {
+    var $content = $('#J-content').delegate('button[data-link]', 'click', function () {
         var url = $(this).data('link');
         chrome.tabs.create({
-            url: url
+            url: url,
+            selected: false
         });
     });
 
@@ -113,10 +120,10 @@ function main() {
         $loading.show();
         $info.hide();
         $.getJSON(APIURL + '/getcate.php?v=' + VERSION + '&mallname=' + _mall + '&cate=' + _cate + '&page=' + p)
-            .done(function(json) {
+            .done(function (json) {
                 if (json.errno === 0) {
                     var html = '';
-                    json.data.forEach(function(v) {
+                    json.data.forEach(function (v) {
                         html += TPL(Template, v);
                     });
 
@@ -143,7 +150,7 @@ function main() {
                     $loadmore.hide();
                 }
                 $loading.hide();
-            }).fail(function() {
+            }).fail(function () {
                 $loadmore.hide();
                 $info.html('网络不畅，请稍后再试！').show();
             });
@@ -156,15 +163,15 @@ function main() {
 
 //返回顶部
 function back2Top() {
-    $('#J-top').click(function() {
+    $('#J-top').click(function () {
         $('body').animate({
             scrollTop: 0
         }, 'fast');
     });
     var timer;
-    $(window).scroll(function() {
+    $(window).scroll(function () {
         timer && clearTimeout(timer);
-        timer = setTimeout(function() {
+        timer = setTimeout(function () {
             var t = $(window).scrollTop();
             if (t > 100) {
                 $('#J-top').show();

@@ -1,10 +1,18 @@
 @import 'item';
 
 #J-nav{
+    span.fl{
+        padding: 3px 0;
+        font-size: 16px;
+        font-weight: bold;
+    }
     .btn{
-        border: 1px solid #ddd;
+        border: none;
         background-color: white;
+        color: #5bb75b;
         font-weight: normal;
+        padding: 4px 8px;
+
         &:hover{
             background-color: #eee;
         }
@@ -13,10 +21,17 @@
         font-weight: bold;
         background-color: #5bb75b;
         border-color: #5bb75b;
+        color: white;
     }
-    .tnav{
+    .tnav button{
         margin-bottom: 10px;
     }
+}
+.tooltip.top .tooltip-arrow{
+    border-top-color: #000
+}
+.tooltip-inner{
+    background-color: #000
 }
 p.desc{
     word-break: break-all;
