@@ -3,24 +3,24 @@
 var Labels = ['label-success', 'label-info', 'label-important', 'label-warning', '', 'label-inverse'];
 
 var ID = (+new Date());
-$(function () {
-
+$(function() {
+    var $switchery = {};
     $('[data-toggle="tooltip"]').tooltip();
 
-    $('#J-sound-test').click(function () {
+    $('#J-sound-test').click(function() {
         var $node = $(this);
         $node.button('loading');
         var b = new Audio('sound/notify.mp3');
-        b.addEventListener('play', function () {
+        b.addEventListener('play', function() {
             $node.button('loading');
         });
-        b.addEventListener('ended', function () {
+        b.addEventListener('ended', function() {
             $node.button('reset');
         });
         b.play();
     });
 
-    $("#J-desktop-test").click(function () {
+    $("#J-desktop-test").click(function() {
         chrome.notifications.create('test-desktop' + (ID++), {
             type: 'basic',
             title: 'Razer 雷蛇 Kraken 北海巨妖 游戏耳机  159元包邮',
@@ -30,17 +30,17 @@ $(function () {
                 title: '立即去抢购>>',
                 iconUrl: '../img/icon64.png'
             }]
-        }, function () {});
+        }, function() {});
     });
 
     //绑定定时静默时间选择器事件
-    $('.J-timer-select').change(function () {
+    $('.J-timer-select').change(function() {
         var $t = $(this);
         var val = this.value;
         var quietTimer = ls.quietTimer ? ls.quietTimer : '';
         quietTimer = quietTimer.split('-');
         quietTimer[$t.data('index') | 0] = val;
-        quietTimer = quietTimer.map(function (v) {
+        quietTimer = quietTimer.map(function(v) {
             return v ? v : 0;
         });
         ls.quietTimer = quietTimer.join('-');
@@ -73,7 +73,7 @@ $(function () {
         }
     }
     //绑定开关事件
-    $('.J-switch').change(function () {
+    $('.J-switch').change(function() {
         var st = settings;
         var $t = $(this);
         var lsid = $t.data('lsid');
@@ -84,6 +84,12 @@ $(function () {
             } else {
                 $('.J-timer-select').attr('disabled', 'disabled');
             }
+        } else if (lsid === 'openNotice') {
+            if (this.checked) {
+                $switchery.hitaoNotice.enable();
+            } else {
+                $switchery.hitaoNotice.disable();
+            }
         }
         ls.settings = JSON.stringify(st);
         chrome.runtime.sendMessage({
@@ -91,18 +97,25 @@ $(function () {
             id: lsid,
             value: this.checked
         }, emptyFn);
-    }).each(function (i, v) {
-        new Switchery(v);
+    }).each(function(i, v) {
+        var $t = $(this);
+        var lsid = $t.data('lsid');
+        $switchery[lsid] = new Switchery(v);
     });
-    $('#J-max-notify').val(localStorage.MAX_NOTIFY ? localStorage.MAX_NOTIFY : 3).change(function () {
+
+    if(!settings.openNotice){
+        $switchery.hitaoNotice.disable();
+    }
+
+    $('#J-max-notify').val(localStorage.MAX_NOTIFY ? localStorage.MAX_NOTIFY : 3).change(function() {
         localStorage.MAX_NOTIFY = $(this).val();
     });
     //关键字事件--------------------------
-    $('#J-keyword-submit').click(function () {
+    $('#J-keyword-submit').click(function() {
         keypress();
         return false;
     });
-    $('#J-keyword').keypress(function (e) {
+    $('#J-keyword').keypress(function(e) {
         if (e.keyCode === 13) {
             keypress();
         }
@@ -110,7 +123,7 @@ $(function () {
     if (keywords.length) {
         var html = '';
 
-        keywords.forEach(function (v) {
+        keywords.forEach(function(v) {
             html += '<span class="label ' + getRandomLabelClass() + '"><a class="J-dkw" href="query.html?q=' + encodeURIComponent(v) + '" target="_blank">' + v + '</a><span class="J-close icon-close"></span></span>';
         });
         $('#J-kw-con').html(html);
@@ -118,12 +131,12 @@ $(function () {
 
 
 
-    $('#J-hot-keyword').delegate('span.J-label', 'click', function () {
+    $('#J-hot-keyword').delegate('span.J-label', 'click', function() {
         var $t = $(this);
         var kw = $t.html();
         insertKeyword(kw);
     });
-    $('#J-kw-con').delegate('.J-close', 'click', function (e) {
+    $('#J-kw-con').delegate('.J-close', 'click', function(e) {
         e.stopPropagation();
         var $t = $(this).parent();
         var kw = $.trim($t.text());
@@ -155,7 +168,7 @@ $(function () {
 
 
     getHot();
-    $('#J-send-mail').click(function () {
+    $('#J-send-mail').click(function() {
         if ($('#J-mybug').val().length < 10) {
             alert('多写两句再发送吧~');
             $('#J-mybug').focus();
@@ -166,14 +179,14 @@ $(function () {
         $.post(APIURL + '/mail.php?v=' + VERSION, {
             content: encodeURIComponent('版本号：' + VERSION + ';;;' + $('#J-mybug').val()),
             email: encodeURIComponent($('#J-email').val())
-        }).done(function () {
+        }).done(function() {
             $t.button('reset');
             $('#J-mybug').val('');
             alert('发送成功，谢谢您的反馈~');
         });
     });
 
-    $('#J-like').click(function () {
+    $('#J-like').click(function() {
         chrome.tabs.create({
             url: $(this).data('link')
         });
@@ -215,7 +228,7 @@ function getHot() {
     } catch (e) {}
     // console.log(kws);
     if (!kws) {
-        $.getJSON(APIURL+'/gethot.php?v=' + VERSION).done(function (json) {
+        $.getJSON(APIURL + '/gethot.php?v=' + VERSION).done(function(json) {
             cb(json);
             try {
                 sessionStorage.hotKeywords = JSON.stringify(json);
@@ -227,7 +240,7 @@ function getHot() {
 
     function cb(json) {
         var html = '';
-        json.forEach(function (v) {
+        json.forEach(function(v) {
             html += '<span title="点击添加到订阅" class="J-label label ' + getRandomLabelClass() + '">' + v + '</span>';
         });
         $('#J-hot').after(html);

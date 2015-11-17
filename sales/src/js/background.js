@@ -1,12 +1,9 @@
 //= include _tpl.js
 //= include _config.js
 var ID = (+new Date());
-var VERSION = chrome.runtime.getManifest().version;
+
 // var MAX_NOTIFY = 6;
-//从localstorage读取设置
-var settings = ls.settings ? ls.settings : '{}';
-//关键词
-var keywords = ls.keywords ? ls.keywords : '[]';
+
 //静默时间
 var quietTimer = ls.quietTimer ? ls.quietTimer : '';
 quietTimer = quietTimer.split('-');
@@ -18,29 +15,11 @@ if (quietTimer.length !== 2) {
     quietTimer = [quietTimer[0] | 0, quietTimer[1] | 0];
 }
 
-try {
-    settings = JSON.parse(settings);
-} catch (e) {
-    settings = {};
-    ls.settings = '{}';
-}
-try {
-    keywords = JSON.parse(keywords);
-} catch (e) {
-    keywords = [];
-    ls.keywords = '[]';
-}
-settings = $.extend({
-    openKeyword: true,
-    openMusic: true,
-    beQuiet: true,
-    openNotice: true
-}, settings);
 
-var emptyFn = function () {};
 var feedTimer, noticeTimer;
-var feedInterval = 113000;
-var noticeInterval = 113000;
+//5分钟获取一次
+var feedInterval = 5 * 60 * 1000;
+var noticeInterval = 5 * 60 * 1000;
 
 var curmaxid = ls.maxCnDealId;
 if (!curmaxid) {
@@ -61,7 +40,7 @@ feedTimer = setInterval(checkNewFeed, feedInterval);
 
 function checkNewFeed() {
     var curmaxidloop = ls.maxCnDealId ? ls.maxCnDealId : 0;
-    $.get(APIURL + '/newfeed.php?v=' + VERSION + '&id=' + curmaxidloop, function (data) {
+    $.get(APIURL + '/newfeed.php?v=' + VERSION + '&id=' + curmaxidloop, function(data) {
         if (data > 99) {
             //不再更新
             clearInterval(feedTimer);
@@ -90,7 +69,7 @@ function checkNewFeed() {
 }
 
 
-chrome.runtime.onMessage.addListener(function (obj, sender, callback) {
+chrome.runtime.onMessage.addListener(function(obj, sender, callback) {
     switch (obj.action) {
         case 'startFeedTimer':
             //如果收到popup的消息，并且通知类型是显示数字
@@ -157,22 +136,24 @@ function checkKeyWordNotice() {
             MAX_NOTIFY = 3;
         }
     }
-    $.getJSON(APIURL + '/getdata.php?v=' + VERSION + '&t=' + (+new Date()) + '&page=1&maxnotifyid=' + maxnotifyid, function (json) {
+    $.getJSON(APIURL + '/getdata.php?v=' + VERSION + '&t=' + (+new Date()) + '&page=1&maxnotifyid=' + maxnotifyid, function(json) {
         if (json.errno === 0) {
             var kw;
             ls.maxnotifyid = json.maxid;
             var play = false;
             var notifyCount = 1;
-            json.data.forEach(function (v) {
+            json.data.forEach(function(v) {
                 var id, opt;
                 var now = Date.now();
+
+
                 //订阅关键字,保证最多弹MAX_NOTIFY个
                 if (keywords.length && settings.openKeyword && notifyCount <= MAX_NOTIFY) {
                     kw = searchKeywords(v.title, v.mallname);
                     // console.log(kw);
                     if (kw) {
                         v.keyword = kw;
-                        var t = kw.split('+'),
+                        var t = kw.split(/[\+@]/),
                             title;
                         if (t.length === 2) {
                             title = '在【' + t[1] + '】找到【' + t[0] + '】的折扣信息';
@@ -194,7 +175,7 @@ function checkKeyWordNotice() {
                         };
                         id = 'kw' + (now++);
 
-                        chrome.notifications.create(id, opt, function () {
+                        chrome.notifications.create(id, opt, function() {
                             //存入sessionStorage
                             ss[id] = JSON.stringify(v);
                             if (!play) {
@@ -205,11 +186,15 @@ function checkKeyWordNotice() {
                         notifyCount++;
                     }
                 }
-
                 if (settings.openNotice && notifyCount <= MAX_NOTIFY) {
+                    // console.log(v.mallname, v.title, settings);
+                    if (v.isus == '1' && !settings.hitaoNotice) {
+                        //如果是海淘，关闭了海淘提醒，则过滤
+                        return;
+                    }
                     var hour = new Date().getHours();
                     hour = hour | 0;
-                    var cb = function () {
+                    var cb = function() {
                         opt = {
                             type: 'basic',
                             title: v.title,
@@ -225,7 +210,7 @@ function checkKeyWordNotice() {
                         };
                         id = 'item' + (now++);
 
-                        chrome.notifications.create(id, opt, function () {
+                        chrome.notifications.create(id, opt, function() {
                             //存入sessionStorage
                             ss[id] = JSON.stringify(v);
 
@@ -250,8 +235,6 @@ function checkKeyWordNotice() {
                         // console.log('其他时间');
                         cb();
                     }
-
-
                 }
             });
 
@@ -259,7 +242,7 @@ function checkKeyWordNotice() {
     });
 }
 
-chrome.notifications.onClicked.addListener(function (id) {
+chrome.notifications.onClicked.addListener(function(id) {
     if (ss[id]) {
         try {
             var obj = JSON.parse(ss[id]);
@@ -274,7 +257,7 @@ chrome.notifications.onClicked.addListener(function (id) {
         }
     }
 });
-chrome.notifications.onButtonClicked.addListener(function (id, i) {
+chrome.notifications.onButtonClicked.addListener(function(id, i) {
     if (ss[id]) {
         if (i === 0) {
             try {
@@ -319,7 +302,7 @@ function searchKeywords(q, mallname) {
     }
     for (var i = 0, len = kw.length; i < len; i++) {
         var v = kw[i];
-        var t = v.split('+');
+        var t = v.split(/[\+@]/);
         if (t.length === 2) {
             //说明需要判断是否是商城名称
             if (q.indexOf(t[0]) !== -1 && mallname.indexOf(t[1].trim()) !== -1) {
@@ -347,7 +330,7 @@ function playNotificationSound() {
 
 
 //监控更新
-chrome.runtime.onInstalled.addListener(function (details) {
+chrome.runtime.onInstalled.addListener(function(details) {
     var version = chrome.runtime.getManifest().version;
     var opt = {
         type: 'basic',
@@ -365,10 +348,10 @@ chrome.runtime.onInstalled.addListener(function (details) {
             iconUrl: 'img/question.png'
         }];
 
-        chrome.notifications.create('install_' + (+new Date()), opt, function () {});
+        chrome.notifications.create('install_' + (+new Date()), opt, function() {});
     } else if (details.reason === 'update') {
         version = chrome.runtime.getManifest().version;
-        opt.message += '\n1. 增加全部特价商品\n2. 增加定制高级关键词';
+        opt.message += '\n1. 增加海淘信息\n2. 重新设置界面\n3. 勿扰模式更加方便';
         opt.buttons = [{
             title: '设置 >>',
             iconUrl: 'img/options.png'
@@ -376,6 +359,6 @@ chrome.runtime.onInstalled.addListener(function (details) {
             title: '查看帮助 >>',
             iconUrl: 'img/question.png'
         }];
-        chrome.notifications.create('update_notify_' + (+new Date()), opt, function () {});
+        chrome.notifications.create('update_notify_' + (+new Date()), opt, function() {});
     }
 });
