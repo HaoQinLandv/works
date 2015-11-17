@@ -75,6 +75,10 @@ $(function () {
                 chrome.browserAction.setTitle({
                     title: '里面条目您都看过了，等有更新了我立马儿通知您！'
                 });
+                if(json.todayTotal){
+                    var total = localStorage.todayTotal = json.todayTotal;
+                    $('#J-total').show().find('.J-text').text(total);
+                }
             }
             if (source !== 'from cache') {
                 try {
