@@ -168,29 +168,7 @@ $(function() {
 
 
     getHot();
-    $('#J-send-mail').click(function() {
-        if ($('#J-mybug').val().length < 10) {
-            alert('多写两句再发送吧~');
-            $('#J-mybug').focus();
-            return;
-        }
-        var $t = $(this);
-        $t.button('loading');
-        $.post(APIURL + '/mail.php?v=' + VERSION, {
-            content: encodeURIComponent('版本号：' + VERSION + ';;;' + $('#J-mybug').val()),
-            email: encodeURIComponent($('#J-email').val())
-        }).done(function() {
-            $t.button('reset');
-            $('#J-mybug').val('');
-            alert('发送成功，谢谢您的反馈~');
-        });
-    });
 
-    $('#J-like').click(function() {
-        chrome.tabs.create({
-            url: $(this).data('link')
-        });
-    });
 
 });
 
