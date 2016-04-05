@@ -112,6 +112,33 @@ chrome.runtime.onMessage.addListener(function(obj, sender, callback) {
     }
 });
 
+//增加右键
+if (chrome.commands) {
+    chrome.commands.onCommand.addListener(function(command) {
+        switch (command) {
+            case 'openAllInNewWindow':
+                chrome.tabs.create({
+                    url: 'aio.html'
+                });
+                break;
+            case 'openSubscribe':
+                chrome.tabs.create({
+                    url: 'query.html'
+                });
+                break;
+            case 'options':
+                chrome.tabs.create({
+                    url: 'options.html'
+                });
+                break;
+            case 'donation':
+                chrome.tabs.create({
+                    url: 'donation.html'
+                });
+                break;
+        }
+    });
+}
 
 noticeTimer = setInterval(checkKeyWordNotice, noticeInterval);
 

@@ -2,6 +2,13 @@
     //= include _tpl.js
     //= include _config.js
 
+    $(document).delegate('[data-event]', 'click', function(e) {
+        var $t = $(this);
+        var handler = $t.attr('data-event');
+        if (handler && window[handler] && typeof window[handler]) {
+            window[handler](e, this);
+        }
+    });
     $('#J-about').on('show', function() {
         $.get(APIURL + '/changelog.php?v=' + VERSION, function(data) {
             $('#J-changelog').html(data);
