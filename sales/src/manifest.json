@@ -10,24 +10,10 @@
       "128": "./img/icon128.png",
       "64": "./img/icon64.png"
    },
-   "permissions": ["tabs", "https://*/*", "http://*/*", "notifications"],
+   "permissions": ["tabs", "https://*/*", "http://*/*", "notifications", "contextMenus"],
    "background": {
       "persistent": true,
       "scripts": ["js/jquery.js", "js/background.js"]
-   },
-   "commands": {
-      "openAllInNewWindow": {
-         "description": "查看全部特价商品"
-      },
-      "openSubscribe": {
-         "description": "查看定制关键词"
-      },
-      "options": {
-         "description": "打开设置页面"
-      },
-      "donation": {
-         "description": "求爷打赏💗"
-      }
    },
    "browser_action": {
       "default_icon": "./img/icon128.png",

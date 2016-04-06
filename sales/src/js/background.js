@@ -3,6 +3,7 @@
 var ID = (+new Date());
 
 // var MAX_NOTIFY = 6;
+var LAST_REFRESH_TIME = Date.now();
 
 //静默时间
 var quietTimer = ls.quietTimer ? ls.quietTimer : '';
@@ -19,7 +20,13 @@ if (quietTimer.length !== 2) {
 var feedTimer, noticeTimer;
 //5分钟获取一次
 var feedInterval = 5 * 60 * 1000;
-var noticeInterval = 5 * 60 * 1000;
+var noticeInterval = ls.NOTIFY_INTERVAL ? ls.NOTIFY_INTERVAL : '5';
+var NOTIFY_INTERVAL_ARRAY = ['5', '10', '15', '30', '60'];
+//保证频度
+if (NOTIFY_INTERVAL_ARRAY.indexOf(noticeInterval) == -1) {
+    ls.NOTIFY_INTERVAL = '5';
+    noticeInterval = '5';
+}
 
 var curmaxid = ls.maxCnDealId;
 if (!curmaxid) {
@@ -71,6 +78,9 @@ function checkNewFeed() {
 
 chrome.runtime.onMessage.addListener(function(obj, sender, callback) {
     switch (obj.action) {
+        case 'notifyInterval':
+            setNotifyInterval();
+            break;
         case 'startFeedTimer':
             //如果收到popup的消息，并且通知类型是显示数字
             if (!feedTimer /*&& ls.noticeType === 'number'*/ ) {
@@ -92,7 +102,7 @@ chrome.runtime.onMessage.addListener(function(obj, sender, callback) {
             break;
         case 'startNotice':
             if (!noticeTimer) {
-                noticeTimer = setInterval(checkKeyWordNotice, noticeInterval);
+                noticeTimer = setInterval(checkKeyWordNotice, getIntervalTime());
             }
             break;
         case 'updateSwitch':
@@ -112,40 +122,249 @@ chrome.runtime.onMessage.addListener(function(obj, sender, callback) {
     }
 });
 
-//增加右键
-if (chrome.commands) {
-    chrome.commands.onCommand.addListener(function(command) {
-        switch (command) {
-            case 'openAllInNewWindow':
+function setNotifyInterval() {
+    var interval = ls.NOTIFY_INTERVAL;
+    if (NOTIFY_INTERVAL_ARRAY.indexOf(interval) !== -1 && noticeInterval != interval && interval != 0) {
+        noticeInterval = interval;
+        noticeTimer && clearInterval(noticeTimer);
+        noticeTimer = setInterval(checkKeyWordNotice, getIntervalTime());
+    } else if (interval === '0') {
+        noticeTimer && clearInterval(noticeTimer);
+    } else {
+        //出错了，回复5分钟刷新
+        noticeInterval = '5';
+        ls.NOTIFY_INTERVAL = 5;
+        noticeTimer && clearInterval(noticeTimer);
+        noticeTimer = setInterval(checkKeyWordNotice, getIntervalTime());
+    }
+}
+
+function getIntervalTime() {
+    var i = ls.NOTIFY_INTERVAL | 0;
+    if (i === 0 || i < 5) {
+        //保持最小5分钟间隔
+        i = 5;
+        noticeInterval = '5';
+        ls.NOTIFY_INTERVAL = i;
+    }
+
+    return i * 60 * 1000;
+}
+
+if (chrome.contextMenus) {
+    //增加右键
+    chrome.contextMenus.create({
+        title: '查找「%s」的优惠',
+        contexts: ['selection'],
+        onclick: function(info, tab) {
+            var txt = info.selectionText;
+            if (txt && txt.length > 0) {
+                txt = encodeURIComponent(txt);
                 chrome.tabs.create({
-                    url: 'aio.html'
+                    url: 'query.html?q=' + txt
                 });
-                break;
-            case 'openSubscribe':
-                chrome.tabs.create({
-                    url: 'query.html'
+            }
+        }
+    }, function() {});
+
+
+    chrome.contextMenus.create({
+        title: '👛 查看全部特价商品',
+        contexts: ['browser_action'],
+        onclick: function() {
+            chrome.tabs.create({
+                url: 'aio.html'
+            });
+        }
+    });
+    chrome.contextMenus.create({
+        title: '🔍 查看定制关键词',
+        contexts: ['browser_action'],
+        onclick: function() {
+            chrome.tabs.create({
+                url: 'query.html'
+            });
+        }
+    });
+    chrome.contextMenus.create({
+        title: '😊 打开设置页面',
+        contexts: ['browser_action'],
+        onclick: function() {
+            chrome.tabs.create({
+                url: 'options.html'
+            });
+        }
+    });
+    chrome.contextMenus.create({
+        title: '💗 求爷打赏n(*≧▽≦*)n',
+        contexts: ['browser_action'],
+        onclick: function() {
+            chrome.tabs.create({
+                url: 'donation.html'
+            });
+        }
+    });
+
+    var notifyMenuId = chrome.contextMenus.create({
+        title: '数据刷新频率',
+        contexts: ['browser_action']
+    });
+    var notifyMenuTexts = {
+        0: '关闭刷新',
+        5: '5分钟[默认]',
+        10: '10分钟',
+        15: '15分钟',
+        30: '半小时',
+        60: '1小时'
+    };
+    chrome.contextMenus.create({
+        title: '立即刷新一次',
+        contexts: ['browser_action'],
+        parentId: notifyMenuId,
+        onclick: function() {
+            var t = Date.now();
+            if (t - LAST_REFRESH_TIME > 1 * 60 * 1000) {
+                checkKeyWordNotice(function(data) {
+                    if (data.errno === 0 && data.length) {
+                        alert('报告主人，发现「' + data.length + '」个新特惠商品');
+                    } else if (data.data.length === 0) {
+                        alert('没有发现新的特惠商品，请主人稍等片刻！');
+                    } else {
+                        var t = confirm('您已经关闭消息提醒，请先去打开消息提醒，去配置页面？');
+                        if (t) {
+                            chrome.tabs.create({
+                                url: 'options.html'
+                            });
+                        }
+                    }
                 });
-                break;
-            case 'options':
-                chrome.tabs.create({
-                    url: 'options.html'
-                });
-                break;
-            case 'donation':
-                chrome.tabs.create({
-                    url: 'donation.html'
-                });
-                break;
+            } else {
+                alert('主人，您手太快了，别着急，一分钟之后再手动刷新~');
+            }
+        }
+    });
+
+    var notifyMenuIds = {};
+    //todo 选择了，给title前面打上对号选中标志
+    notifyMenuIds[0] = chrome.contextMenus.create({
+        title: (noticeInterval == 0 ? '√ ' : '') + '关闭刷新',
+        contexts: ['browser_action'],
+        parentId: notifyMenuId,
+        onclick: function() {
+            var oldId = ls.NOTIFY_INTERVAL;
+            var id = notifyMenuIds[oldId];
+            var text = notifyMenuTexts[oldId];
+            updateMenu(id, text);
+            noticeTimer && clearInterval(noticeTimer);
+            oldId = ls.NOTIFY_INTERVAL = 0;
+            text = notifyMenuTexts[oldId];
+            updateMenu(notifyMenuIds[oldId], '√ ' + text);
+        }
+    });
+
+    chrome.contextMenus.create({
+        contexts: ['browser_action'],
+        parentId: notifyMenuId,
+        type: 'separator'
+    });
+
+    notifyMenuIds[5] = chrome.contextMenus.create({
+        title: (noticeInterval == 5 ? '√ ' : '') + '5分钟[默认]',
+        contexts: ['browser_action'],
+        parentId: notifyMenuId,
+        onclick: function() {
+            var oldId = ls.NOTIFY_INTERVAL;
+            var id = notifyMenuIds[oldId];
+            var text = notifyMenuTexts[oldId];
+            updateMenu(id, text);
+            oldId = ls.NOTIFY_INTERVAL = 5;
+            setNotifyInterval();
+            text = notifyMenuTexts[oldId];
+            updateMenu(notifyMenuIds[oldId], '√ ' + text);
+        }
+    });
+    notifyMenuIds[10] = chrome.contextMenus.create({
+        title: (noticeInterval == 10 ? '√ ' : '') + '10分钟',
+        contexts: ['browser_action'],
+        parentId: notifyMenuId,
+        onclick: function() {
+            var oldId = ls.NOTIFY_INTERVAL;
+            var id = notifyMenuIds[oldId];
+            var text = notifyMenuTexts[oldId];
+            updateMenu(id, text);
+            oldId = ls.NOTIFY_INTERVAL = 10;
+            setNotifyInterval();
+            text = notifyMenuTexts[oldId];
+            updateMenu(notifyMenuIds[oldId], '√ ' + text);
+        }
+    });
+    notifyMenuIds[15] = chrome.contextMenus.create({
+        title: (noticeInterval == 15 ? '√ ' : '') + '15分钟',
+        contexts: ['browser_action'],
+        parentId: notifyMenuId,
+        onclick: function() {
+            var oldId = ls.NOTIFY_INTERVAL;
+            var id = notifyMenuIds[oldId];
+            var text = notifyMenuTexts[oldId];
+            updateMenu(id, text);
+            oldId = ls.NOTIFY_INTERVAL = 15;
+            setNotifyInterval();
+
+            text = notifyMenuTexts[oldId];
+            updateMenu(notifyMenuIds[oldId], '√ ' + text);
+        }
+    });
+    notifyMenuIds[30] = chrome.contextMenus.create({
+        title: (noticeInterval == 30 ? '√ ' : '') + '半小时',
+        contexts: ['browser_action'],
+        parentId: notifyMenuId,
+        onclick: function() {
+            var oldId = ls.NOTIFY_INTERVAL;
+            var id = notifyMenuIds[oldId];
+            var text = notifyMenuTexts[oldId];
+            updateMenu(id, text);
+            oldId = ls.NOTIFY_INTERVAL = 30;
+            setNotifyInterval();
+
+            text = notifyMenuTexts[oldId];
+            updateMenu(notifyMenuIds[oldId], '√ ' + text);
+        }
+    });
+    notifyMenuIds[60] = chrome.contextMenus.create({
+        title: (noticeInterval == 60 ? '√ ' : '') + '1小时',
+        contexts: ['browser_action'],
+        parentId: notifyMenuId,
+        onclick: function() {
+            var oldId = ls.NOTIFY_INTERVAL;
+            var id = notifyMenuIds[oldId];
+            var text = notifyMenuTexts[oldId];
+            updateMenu(id, text);
+            oldId = ls.NOTIFY_INTERVAL = 60;
+            setNotifyInterval();
+
+            text = notifyMenuTexts[oldId];
+            updateMenu(notifyMenuIds[oldId], '√ ' + text);
         }
     });
 }
 
-noticeTimer = setInterval(checkKeyWordNotice, noticeInterval);
+function updateMenu(id, text) {
+    if (chrome.contextMenus && text && id) {
+        chrome.contextMenus.update(id, {
+            title: text
+        }, function() {});
+    }
+}
 
-function checkKeyWordNotice() {
+if (ls.NOTIFY_INTERVAL) {
+    noticeTimer = setInterval(checkKeyWordNotice, getIntervalTime());
+}
+
+function checkKeyWordNotice(cb) {
+    cb = typeof cb === 'function' ? cb : function() {};
     if (!settings.openNotice && (keywords.length === 0 || !settings.openKeyword)) {
         //没有打开提醒，并且关键词也没打开
-        return;
+        return cb(false);
     }
     var maxnotifyid = ls.maxnotifyid;
     if (!maxnotifyid) {
@@ -163,7 +382,9 @@ function checkKeyWordNotice() {
             MAX_NOTIFY = 3;
         }
     }
-    $.getJSON(APIURL + '/getdata.php?v=' + VERSION + '&t=' + (+new Date()) + '&page=1&maxnotifyid=' + maxnotifyid, function(json) {
+    $.getJSON(APIURL + '/getdata.php?v=' + VERSION + '&t=' + (+new Date()) + '&page=1&interval=' + noticeInterval + '&maxnotifyid=' + maxnotifyid, function(json) {
+        LAST_REFRESH_TIME = Date.now();
+        cb(json);
         if (json.errno === 0) {
             var kw;
             ls.maxnotifyid = json.maxid;

@@ -103,12 +103,18 @@ $(function() {
         $switchery[lsid] = new Switchery(v);
     });
 
-    if(!settings.openNotice){
+    if (!settings.openNotice) {
         $switchery.hitaoNotice.disable();
     }
 
     $('#J-max-notify').val(localStorage.MAX_NOTIFY ? localStorage.MAX_NOTIFY : 3).change(function() {
         localStorage.MAX_NOTIFY = $(this).val();
+    });
+    $('#J-notify-interval').val(localStorage.NOTIFY_INTERVAL ? localStorage.NOTIFY_INTERVAL : 5).change(function() {
+        localStorage.NOTIFY_INTERVAL = $(this).val();
+        chrome.runtime.sendMessage({
+            action: 'notifyInterval'
+        }, emptyFn);
     });
     //关键字事件--------------------------
     $('#J-keyword-submit').click(function() {
