@@ -4,5 +4,5 @@ node_modules
 build
 dest
 npm-debug.log
-
+.DS_Store
 *.zip
