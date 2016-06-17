@@ -1,0 +1,15 @@
+<%- include('tpl/header', {
+   title:'设置',
+   css:['qrcode'],
+   js:['jquery-qrcode','qrcode']
+}); %>
+  <%- include('tpl/navbar', {activeNav:'options'})%>
+    <div class="body-wrapper">
+      <h3>掏出手机扫描二维码手机打开页面</h3>
+      <div class="qrwrap">
+        <div id="J-qrcode"></div>
+        <p id="J-qrtitle"></p>
+      </div>
+    </div>
+    <%- include('tpl/footer')%>
+

@@ -1,0 +1,19 @@
+@import 'base';
+.body-wrapper {
+  width: 940px;
+  margin: 0 auto;
+  h3 {
+    padding-bottom: 10px;
+    text-align: center;
+  }
+}
+
+#J-qrcode {
+  width: 400px;
+  height: 400px;
+  margin: 0 auto;
+}
+
+#J-qrtitle {
+  text-align: center;
+}
