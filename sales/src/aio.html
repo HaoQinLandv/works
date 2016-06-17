@@ -1,34 +1,40 @@
 <%- include('tpl/header', {
    title:'全部特价信息',
    css:['options','aio'],
-   js:[ 'aio']
+   js:[ 'aio', 'jquery-qrcode']
 }); %>
-
-
-<%- include('tpl/navbar', {activeNav:'aio'})%>
-<div class="body-wrapper">
-    <div id="J-nav">
-
-    </div>
-    <div id="J-content">
-
-    </div>
-    <div id="J-loadmore" class="loadmore clearfix" style="diplay:none;">
+  <%- include('tpl/navbar', {activeNav:'aio'})%>
+    <div class="body-wrapper">
+      <div id="J-nav">
+      </div>
+      <div id="J-content">
+      </div>
+      <div id="J-loadmore" class="loadmore clearfix" style="diplay:none;">
         <button class="btn">加载更多30条...</button>
-    </div>
-    <div id="J-loading" class="loading">
+      </div>
+      <div id="J-loading" class="loading">
         <div class="loadingicon progress progress-indeterminate">
-            <div class="win-ring small"></div>
+          <div class="win-ring small"></div>
         </div>
         <span class="loadingmoreword">加载中，请稍候...</span>
+      </div>
     </div>
-</div>
-
-<div id="J-info">
-</div>
-<%- include('tpl/item') %>
-<%- include('tpl/totop') %>
-<%- include('tpl/footer') %>
-
-
+    <div id="J-info">
+    </div>
+    <div class="modal hide fade" id="J-qrcontent">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+        <h3>掏出手机扫码打开页面</h3>
+      </div>
+      <div class="modal-body">
+        <div id="J-qr"></div>
+        <p id="J-qrtitle"></p>
+      </div>
+      <div class="modal-footer">
+        <a href="javascript:void(0);" data-dismiss="modal" class="btn btn-success">关闭</a>
+      </div>
+    </div>
+    <%- include('tpl/item') %>
+      <%- include('tpl/totop') %>
+        <%- include('tpl/footer') %>
 

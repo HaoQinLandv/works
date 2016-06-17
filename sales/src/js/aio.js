@@ -100,6 +100,13 @@ function main() {
       url: url,
       selected: false
     });
+  }).delegate('span.J-qrcode', 'click', function() {
+    var $t = $(this);
+    var link = $t.data('url');
+    var title = $t.data('title');
+    $('#J-qrtitle').html(title);
+    $('#J-qr').empty().qrcode({ text: link, width: 250, height: 250 });
+    $('#J-qrcontent').modal('show');
   });
 
 

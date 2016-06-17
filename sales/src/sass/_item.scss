@@ -57,6 +57,20 @@
   .links button {
     width: 90px;
   }
+  .links {
+    position: relative;
+  }
+  .qrlink {
+    color: #5bb75b;
+    position: absolute;
+    display: inline-block;
+    right: 110px;
+    top: 5px;
+    cursor: pointer;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 
 .listview-item {
