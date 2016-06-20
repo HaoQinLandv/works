@@ -597,16 +597,16 @@ chrome.runtime.onInstalled.addListener(function(details) {
     }];
 
     chrome.notifications.create('install_' + (+new Date()), opt, function() {});
-  } else if (details.reason === 'update') {
-    version = chrome.runtime.getManifest().version;
-    opt.message += '\n1. 增加海淘信息\n2. 重新设置界面\n3. 勿扰模式更加方便';
-    opt.buttons = [{
-      title: '设置 >>',
-      iconUrl: 'img/options.png'
-    }, {
-      title: '查看帮助 >>',
-      iconUrl: 'img/question.png'
-    }];
-    chrome.notifications.create('update_notify_' + (+new Date()), opt, function() {});
+    // } else if (details.reason === 'update') {
+    // version = chrome.runtime.getManifest().version;
+    // opt.message += '\n1. 增加海淘信息\n2. 重新设置界面\n3. 勿扰模式更加方便';
+    // opt.buttons = [{
+    //   title: '设置 >>',
+    //   iconUrl: 'img/options.png'
+    // }, {
+    //   title: '查看帮助 >>',
+    //   iconUrl: 'img/question.png'
+    // }];
+    // chrome.notifications.create('update_notify_' + (+new Date()), opt, function() {});
   }
 });
