@@ -151,6 +151,25 @@ body {
   .J-desc {
     cursor: pointer;
   }
+  .buy {
+    width: 80px;
+    padding: 4px 5px;
+    margin-right: 0;
+  }
+  .links {
+    position: relative;
+  }
+  .qrlink {
+    color: #5bb75b;
+    position: absolute;
+    display: inline-block;
+    right: 90px;
+    top: 4px;
+    cursor: pointer;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 
 footer {

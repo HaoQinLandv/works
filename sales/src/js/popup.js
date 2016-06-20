@@ -43,6 +43,14 @@ $(function() {
     });
   }).delegate('p.J-desc', 'click', function() {
     $(this).find('.J-more').toggle();
+  }).delegate('span.J-qrcode', 'click', function() {
+    var $t = $(this);
+    var link = $t.data('url');
+    var title = $t.data('title');
+    chrome.tabs.create({
+      url: './qrcode.html?url=' + encodeURIComponent(link) + '&title=' + encodeURIComponent(title),
+      selected: false
+    });
   });
 
   function append(json, source) {
