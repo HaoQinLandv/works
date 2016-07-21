@@ -25,7 +25,16 @@ $(function() {
       url: url,
       selected: false
     });
+  }).delegate('span.J-qrcode', 'click', function() {
+    console.log(1);
+    var $t = $(this);
+    var link = $t.data('url');
+    var title = $t.data('title');
+    $('#J-qrtitle').html(title);
+    $('#J-qr').empty().qrcode({ text: link, width: 250, height: 250 });
+    $('#J-qrcontent').modal('show');
   });
+
   var $loadmore = $('#J-loadmore').click(function() {
     $loadmore.hide();
     $loading.show();
@@ -99,6 +108,7 @@ $(function() {
       if (json && json.errno === 0) {
         var html = '';
         json.data.forEach(function(v) {
+          v.origTitle = v.title;
           v.title = v.title.replace(new RegExp(q, 'g'), '<span class="key">' + q + '</span>');
           v.detail = v.detail.replace(new RegExp(q, 'g'), '<span class="key">' + q + '</span>');
           html += TPL(Template, v);

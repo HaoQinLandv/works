@@ -1,4 +1,5 @@
 function TPL(html, data) {
+  data.origTitle = data.origTitle || data.title;
   for (var i in data) {
     html = html.replace(new RegExp('{{\\s*' + i + '\\s*}}', 'g'), data[i]);
   }
