@@ -98,8 +98,12 @@ function p_detail(url) {
         var $abs = $node.find('#mdabstract');
         $abs.find('.m99adhead,.m99adfoot,.cheapitem').remove();
         var t = $abs.find('dt').html();
-        t = t ? t.trim() : '';
-        var text = $abs.find('p').text().trim();
+        t = t ? t.trim() + '<br/>' : '';
+        var text = [];
+        $abs.find('p').each(function(i,v){
+            text.push($(v).text().trim());
+        });
+        text = text.join('<br/>');
         if (!text) {
             $abs.find('dt').remove();
             text = $abs.text().trim();
