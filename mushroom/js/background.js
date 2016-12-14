@@ -79,7 +79,7 @@ function dealList(data, isus) {
     function end() {
         count--;
         if (count === 0) {
-            console.log(data, isus);
+            // console.log(data, isus);
             $.post('http://zhufu.sinaapp.com/spider/spider/update_items_chr.php?debug=1', {
                 data: JSON.stringify(data),
                 isus: isus
@@ -97,7 +97,8 @@ function p_detail(url) {
         var $node = $(data);
         var $abs = $node.find('#mdabstract');
         $abs.find('.m99adhead,.m99adfoot,.cheapitem').remove();
-        var t = $abs.find('dt').html().trim();
+        var t = $abs.find('dt').html();
+        t = t ? t.trim() : '';
         var text = $abs.find('p').text().trim();
         if (!text) {
             $abs.find('dt').remove();
