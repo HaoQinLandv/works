@@ -97,8 +97,13 @@ function p_detail(url) {
         var $node = $(data);
         var $abs = $node.find('#mdabstract');
         $abs.find('.m99adhead,.m99adfoot,.cheapitem').remove();
+        var t = $abs.find('dt').html().trim();
         var text = $abs.find('p').text().trim();
-        d.resolve(text);
+        if (!text) {
+            $abs.find('dt').remove();
+            text = $abs.text().trim();
+        }
+        d.resolve(t + text);
     });
 
     return d;
