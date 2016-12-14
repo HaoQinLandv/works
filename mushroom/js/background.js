@@ -1,31 +1,6 @@
-var INTERVAL = 5 * 60 * 1000;
+var INTERVAL = 3 * 60 * 1000;
 var EVERY_NUM = 50;
-var TIMER = setInterval(getEmptyItem, INTERVAL);
-var CATE_LIST = [
-    'baby',
-    'stockup',
-    'daily',
-    'digital',
-    'electrical',
-    'food',
-    'clothes',
-    'makeup',
-    'sport',
-    'automobile',
-    'sale',
-    //us
-    'us_baby',
-    'us_stockup',
-    'us_daily',
-    'us_digital',
-    'us_electrical',
-    'us_food',
-    'us_clothes',
-    'us_makeup',
-    'us_sport',
-    'us_automobile',
-    'us_sale'
-];
+var TIMER = setInterval(getNews, INTERVAL);
 
 sessionStorage.unique = '';
 
@@ -33,9 +8,6 @@ sessionStorage.unique = '';
 setInterval(function() {
     sessionStorage.unique = '';
 }, INTERVAL * 12);
-
-setInterval(getList, INTERVAL); //获取list
-setInterval(getCateList, INTERVAL);//获取catlist
 
 var cusEvent = {
     _data: {},
@@ -69,190 +41,112 @@ var cusEvent = {
     }
 };
 
-function getCateList() {
 
-    CATE_LIST.forEach(function(k) {
-        var isus = 0;
-        if (k.indexOf('us_') === 0) {
-            isus = 1;
-            var c = k.split('_')[1];
 
-            var url = 'http://guangdiu.com/cate.php?c=us&k=' + c + '&v=' + Date.now() + '&p=1';
 
-        } else {
-            //http://guangdiu.com/cate.php?k=daily&c=us
-            var url = 'http://guangdiu.com/cate.php?k=' + k + '&v=' + Date.now() + '&p=1';
+function getNews() {
+    $.getJSON('http://guangdiu.com/api/getlist.php?count=10', function(data) {
+        dealList(data.data);
+    });
+    $.getJSON('http://guangdiu.com/api/getlist.php?count=10&country=us', function(data) {
+        dealList(data.data, 1);
+    });
+}
+
+function dealList(data, isus) {
+    if (!data) {
+        return;
+    }
+    isus = isus || 0;
+    var uni = sessionStorage.unique;
+
+    var count = data.length;
+
+    data.forEach(function(d) {
+        if (uni.indexOf(d.id) === -1) {
+            var id = d.id;
+            sessionStorage.unique += '_' + id;
+            var detail_url = 'http://guangdiu.com/api/showdetail.php?id=' + id;
+            var go_url = 'http://guangdiu.com/go.php?catch=1&id=' + id;
+            $.when(p_detail(detail_url), p_url(go_url)).done(function(detail, url) {
+                d.detail = detail;
+                d.url = go_url === url ? d.buyurl : url;
+                end();
+            });
         }
-
-        get(url, function(isus, k) {
-            return function(data) {
-                var $dom = $(data);
-                var result = [];
-                var names = {};
-                $dom.find('div.gooditem').each(function(i, v) {
-                    var $v = $(v);
-                    var $title = $v.find('a.goodname');
-                    var $mallname = $v.find('a.rightmallname');
-                    var mallname = '';
-                    if ($mallname.length) {
-                        mallname = $mallname.text().trim();
-                    }
-                    var id = $title.attr('href');
-                    id = id.match(/(\d+)$/)[0];
-                    result.push(id);
-                    names[id] = mallname;
-                });
-                result.length && $.post('http://zhufu.sinaapp.com/spider/spider/update_cate.php',{
-                    isus: isus,
-                    cate: k,
-                    ids: JSON.stringify(result),
-                    names: JSON.stringify(names)
-                }, function(d){
-                    console.log(d);
-                });
-            }
-        }(isus, k));
     });
 
-
-}
-
-function get(url, callback) {
-    $.get(url, callback);
-}
-
-function getList() {
-    var uni = sessionStorage.unique;
-    $.get('http://guangdiu.com/index.php?p=1&c=us&v=' + Date.now(), function(data) {
-        var result = {};
-        $(data).find('.gooditem').each(function(i, v) {
-            var $v = $(v);
-            var id = $v.find('a.goodname').attr('href');
-            if (!id) {
-                return;
-            }
-            id = id.match(/(\d+)$/)[0];
-            //保证唯一
-            if (uni.indexOf(id) !== -1) {
-                return;
-            }
-
-            var img = $v.find('.showpic img').attr('src');
-            if (/^\/\//.test(img)) {
-                img = 'http:' + img;
-            }
-            var mallname = $v.find('.rightmallname').text().trim();
-            var title = $v.find('.mallandname').text().trim().replace(/\n/g, ' ');
-            var detail = $v.find('.abstractcontent').text().trim();
-            detail = detail.replace(/(.*?)\&nbsp\;\s+完整阅读>/, '$1');
-
-            var source = $v.find('.infofrom').text().trim();
-            var url = $v.find('.innergototobuybtn').attr('href');
-            source = source.split(/\s+/);
-            source = source[1] ? source[1] : source[0];
-            source = source.replace(/^从/, '');
-            source = source.replace(/同步$/, '');
-
-
-            result[id] = {
-                img: img,
-                source: source,
-                detail: detail,
-                id: id,
-                url: url,
-                mallname: mallname,
-                title: title
-            };
-        });
-        if (Object.keys(result).length > 0) {
-            $.post('http://zhufu.sinaapp.com/spider/spider/update_items.php', {
-                data: JSON.stringify(result)
+    function end() {
+        count--;
+        if (count === 0) {
+            console.log(data, isus);
+            $.post('http://zhufu.sinaapp.com/spider/spider/update_items_chr.php?debug=1', {
+                data: JSON.stringify(data),
+                isus: isus
             }, function(d) {
                 console.log(d);
-                d = d.split('\n');
-                d.forEach(function(v) {
-                    if (/\d+/.test(d) && sessionStorage.unique.indexOf(d) === -1) {
-                        sessionStorage.unique += ',' + d;
-                    }
-                });
-            })
+            });
         }
-
-    });
-
-    $.get('http://guangdiu.com/m/loaddata.php?v=' + Date.now() + '&p=1', function(data) {
-
-        var result = {};
-        $(data).find('.leftcontent').each(function(i, v) {
-            var $dom = $(v);
-            var id = $dom.find('a.title').attr('href');
-            if (!id) {
-                return;
-            }
-            id = id.match(/(\d+)$/)[0];
-            //保证唯一
-            if (uni.indexOf(id) !== -1) {
-                return;
-            }
-            var title = $dom.find('a.title').text().trim().replace(/\n/g, ' ');
-            var img = $dom.find('.thumbnail img').attr('src');
-            if (/^\/\//.test(img)) {
-                img = 'http:' + img;
-            }
-
-            var mallname = $dom.find('.mallname').text().trim();
-            var detail = $dom.find('.abstract').text().trim();
-            var url = $dom.find('.buy').attr('href');
-            var source = $dom.find('.info').text().trim();
-            source = source.split(/\s+/);
-            source = source[1] ? source[1] : source[0];
-            result[id] = {
-                img: img,
-                source: source,
-                detail: detail,
-                id: id,
-                url: url,
-                mallname: mallname,
-                title: title
-            };
-        });
-
-        if (Object.keys(result).length > 0) {
-            $.post('http://zhufu.sinaapp.com/spider/spider/update_items.php', {
-                data: JSON.stringify(result),
-                isus: 1
-            }, function(d) {
-                d = d.split('\n');
-                d.forEach(function(v) {
-
-                    if (/\d+/.test(d) && sessionStorage.unique.indexOf(d) === -1) {
-
-                        sessionStorage.unique += ',' + d;
-                    }
-                });
-            })
-        }
-
-    });
+    }
 }
 
-function getEmptyItem() {
-    $.get('http://zhufu.sinaapp.com/spider/spider/get_empty_url.php?num=' + EVERY_NUM, function(data) {
-        data = data.split('\n');
-        var result = [];
-        data.forEach(function(t) {
-            t = t.split(',,,');
-            if (t.length === 2) {
-                result.push({
-                    id: t[0],
-                    url: t[1]
-                });
+function p_detail(url) {
+    var d = $.Deferred();
+
+    $.get(url, function(data) {
+        var $node = $(data);
+        var $abs = $node.find('#mdabstract');
+        $abs.find('.m99adhead,.m99adfoot,.cheapitem').remove();
+        var text = $abs.find('p').text().trim();
+        d.resolve(text);
+    });
+
+    return d;
+}
+var isDone = {};
+
+function p_url(url) {
+    var d = $.Deferred();
+    isDone[url] = 1;
+
+    var urls = parse_url(url);
+    if ($.inArray(urls.host, ['detail.tmall.com']) !== -1) {
+        end(url);
+    } else {
+        cusEvent.once(url, function(rurl) {
+            if (rurl && isDone[url]) {
+                rurl = getUnionLink(rurl);
+                end(rurl);
             }
         });
+        $.get(url, function(data) {
+            if (!isDone[url]) {
+                //保证执行一次
+                return;
+            }
+            var d = /(http[s]?:\/\/.*)['"]/g.exec(data);
+            if (d && d[1]) {
 
-        getUnionUrl(result);
-    });
+                var u = getUnionLink(d[1]);
+                if (u.length > 300 || /^http[s]?:\/\/www.w3.org/.test(u) || /['"]/.test(u)) {
+
+                } else {
+                    url = u;
+                }
+            }
+            end(url);
+        });
+    }
+
+    function end(url) {
+        delete isDone[url];
+        d.resolve(url);
+    }
+
+    return d;
 }
+
+
 chrome.webRequest.onBeforeRedirect.addListener(function(detail) {
     if (detail.statusCode === 301 && detail.redirectUrl) {
         cusEvent.fire(detail.url, detail.redirectUrl);
@@ -332,16 +226,7 @@ function getUnionUrl(res) {
     }
 }
 
-function postData(data) {
-    if (data && data.length) {
-        $.post('http://zhufu.sinaapp.com/spider/spider/update_url.php', {
-            urls: data.join(',,,')
-        }, function(d) {
-            console.log(d);
-        })
 
-    }
-}
 
 function getUnionLink(url) {
     if (/^http[s]?:\/\/count.chanet.com.cn\/click.cgi/.test(url) || /www.jdoqocy.com\/click/.test(url)) {
@@ -415,4 +300,3 @@ var parse_url = function() {
     }
 }();
 //start
-getEmptyItem();
