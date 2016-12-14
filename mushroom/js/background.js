@@ -45,10 +45,10 @@ var cusEvent = {
 
 
 function getNews() {
-    $.getJSON('http://guangdiu.com/api/getlist.php?count=10', function(data) {
+    $.getJSON('http://guangdiu.com/api/getlist.php?count=10&_t=' + Date.now(), function(data) {
         dealList(data.data);
     });
-    $.getJSON('http://guangdiu.com/api/getlist.php?count=10&country=us', function(data) {
+    $.getJSON('http://guangdiu.com/api/getlist.php?count=10&country=us&_t=' + Date.now(), function(data) {
         dealList(data.data, 1);
     });
 }
