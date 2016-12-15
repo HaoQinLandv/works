@@ -101,7 +101,7 @@ function p_detail(url) {
     $.get(url, function(data) {
         var $node = $(data);
         var $abs = $node.find('#mdabstract');
-        $abs.find('.m99adhead,.m99adfoot,.cheapitem,ul,h2,h3,h1,h4,h5').remove();
+        $abs.find('.m99adhead,.m99adfoot,.cheapitem,ul,h2,h3,h1,h4,h5,a img').remove();
         var t = $abs.find('dt').html();
         t = t ? t.trim() : '';
         t = t.replace(/<(span).*>(.+)<\/\1>/, '$2').replace(/&nbsp;/g, '');
@@ -122,14 +122,15 @@ function p_detail(url) {
                 $(a).removeAttr('onclick')
 
             });
-            var others = $v.find('div,ul,img,li,dt,dl,table,a[isconvert!=1],a[isconvert!=1] img');
+            var others = $v.find('div,ul,img,li,dt,dl,table,a[isconvert!=1],a img');
             if (others.length) {
                 return;
             }
             var p = $v.text().trim();
-            if (withLink) {
+            if (withLink && p) {
                 p = $v.html().trim();
-                p.replace(/<a .*guangdiu.com>.*<\/a>/, '').replace(/<(span|strong).+?>(.+?)<\/\1>/g, '$2');
+                p.replace(/<a .*guangdiu.com>.*<\/a>/, '').replace(/<(span|strong).+?>(.+?)<\/\1>/g, '$2')
+
             }
             switch (p) {
                 case '海淘攻略':
@@ -144,13 +145,14 @@ function p_detail(url) {
             $abs.find('dt').remove();
             text = $abs[0].innerText.trim();
         }
-        text = text.replace(/(<br\/>)+$/, '').replace(/^(<br\/>)+/, '');
+
         text = trimHtml(text + (t ? '<br/>' + t : ''), { limit: 500 }).html;
 
         if (text.length > 1000) {
-            text = text.replace(/<.+?>/g, '');
+            text = text.replace(/<[^>]+>/g, '');
         }
-        d.resolve(text + (t ? '<br/>' + t : ''));
+        text = text.replace(/(<br[\/]?>)+$/, '').replace(/^(<br[\/]?>)+/, '').replace(/<a [^>]+>\s+<\/a>/g, '').replace(/(\\t)+/g, '').replace(/<\!--.*-->/, '');
+        d.resolve(text);
     });
 
     return d;
