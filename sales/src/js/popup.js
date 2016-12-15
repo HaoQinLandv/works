@@ -43,6 +43,14 @@ $(function() {
     });
   }).delegate('p.J-desc', 'click', function() {
     $(this).find('.J-more').toggle();
+  }).delegate('p.J-desc a', 'click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var link = $(this).attr('href');
+    chrome.tabs.create({
+      url: link,
+      selected: false
+    });
   }).delegate('span.J-qrcode', 'click', function() {
     var $t = $(this);
     var link = $t.data('url');
@@ -62,8 +70,10 @@ $(function() {
       // console.log(json.data);
       json.data.forEach(function(v) {
         var detail = v.detail;
-        v.detail = detail.slice(0, 80);
-        v.more = detail.slice(80);
+        var thtml = trimHtml(detail, {limit: 80, suffix: ''});
+        v.detail = thtml.html;
+
+        v.more = thtml.more;
         v.mallname = (v.mallname || '').slice(0, 10);
         if (!v.more) {
           v.more = '';
@@ -135,7 +145,116 @@ $(function() {
   }
 });
 
+function trimHtml(html, options) {
 
+    options = options || {};
+
+    var limit = options.limit || 100,
+        wordBreak = (typeof options.wordBreak !== 'undefined') ? options.wordBreak : false,
+        suffix = options.suffix || '';
+
+    var arr = html.replace(/</g, "\n<")
+        .replace(/>/g, ">\n")
+        .replace(/\n\n/g, "\n")
+        .replace(/^\n/g, "")
+        .replace(/\n$/g, "")
+        .split("\n");
+
+    var sum = 0,
+        row, cut, add,
+        tagMatch,
+        tagName,
+        tagStack = [],
+        more = [];
+
+    for (var i = 0; i < arr.length; i++) {
+
+        row = arr[i];
+        // count multiple spaces as one character
+        rowCut = row.replace(/[ ]+/g, ' ');
+
+        if (!row.length) {
+            continue;
+        }
+
+        if (row[0] !== "<") {
+
+            if (sum >= limit) {
+                row = "";
+                more.push(arr[i]);
+            } else if ((sum + rowCut.length) >= limit) {
+
+                cut = limit - sum;
+
+                if (row[cut - 1] === ' ') {
+                    while (cut) {
+                        cut -= 1;
+                        if (row[cut - 1] !== ' ') {
+                            break;
+                        }
+                    }
+                } else {
+
+                    add = row.substring(cut).split('').indexOf(' ');
+
+                    // break on halh of word
+                    if (!wordBreak) {
+                        if (add !== -1) {
+                            cut += add;
+                        } else {
+                            cut = row.length;
+                        }
+                    }
+                }
+
+                row = row.substring(0, cut) + suffix;
+                sum = limit;
+                more.push(row.slice(cut + suffix.length));
+
+            } else {
+                sum += rowCut.length;
+            }
+
+        } else if (sum >= limit) {
+            tagMatch = row.match(/[a-zA-Z]+/);
+
+            tagName = tagMatch ? tagMatch[0] : '';
+
+            if (tagName) {
+                if (row.substring(0, 2) !== '</') {
+
+                    tagStack.push(tagName);
+                    row = '';
+                    more.push(arr[i]);
+                } else {
+
+                    while (tagStack[tagStack.length - 1] !== tagName && tagStack.length) {
+                        tagStack.pop();
+                    }
+
+                    if (tagStack.length) {
+                        row = '';
+                    more.push(arr[i]);
+
+                    }
+
+                    tagStack.pop();
+                }
+            } else {
+                row = '';
+                more.push(arr[i]);
+
+            }
+        }
+
+        arr[i] = row;
+    }
+
+    return {
+        html: arr.join("\n").replace(/\n/g, ""),
+        more: more.join("\n").replace(/\n/g, "")
+    };
+}
 
 //= include _tpl.js
 

@@ -104,6 +104,9 @@ function p_detail(url) {
         $abs.find('p').each(function(i, v) {
             // $(v).find('a[isconvert]').removeAttr('isconvert');
             var $v = $(v);
+            if ($v.text().trim() === '') {
+                return;
+            }
             var withLink = false;
             $v.find('a').each(function(n, a) {
                 if ($(a).attr('href').indexOf('guangdiu.com') !== -1) {
@@ -132,11 +135,16 @@ function p_detail(url) {
             }
         });
         text = text.join('<br/>');
-        if (!text) {
+        if (!text && $abs[0]) {
             $abs.find('dt').remove();
             text = $abs[0].innerText.trim();
         }
         text = text.replace(/(<br\/>)+$/, '').replace(/^(<br\/>)+/, '');
+        text = trimHtml(text + (t ? '<br/>' + t : ''), { limit: 500 }).html;
+
+        if (text.length > 1000) {
+            text = text.replace(/<.+?>/g, '');
+        }
         d.resolve(text + (t ? '<br/>' + t : ''));
     });
 
@@ -339,3 +347,114 @@ var parse_url = function() {
     }
 }();
 //start
+//
+function trimHtml(html, options) {
+
+    options = options || {};
+
+    var limit = options.limit || 100,
+        wordBreak = (typeof options.wordBreak !== 'undefined') ? options.wordBreak : false,
+        suffix = options.suffix || '';
+
+    var arr = html.replace(/</g, "\n<")
+        .replace(/>/g, ">\n")
+        .replace(/\n\n/g, "\n")
+        .replace(/^\n/g, "")
+        .replace(/\n$/g, "")
+        .split("\n");
+
+    var sum = 0,
+        row, cut, add,
+        tagMatch,
+        tagName,
+        tagStack = [],
+        more = [];
+
+    for (var i = 0; i < arr.length; i++) {
+
+        row = arr[i];
+        // count multiple spaces as one character
+        rowCut = row.replace(/[ ]+/g, ' ');
+
+        if (!row.length) {
+            continue;
+        }
+
+        if (row[0] !== "<") {
+
+            if (sum >= limit) {
+                row = "";
+                more.push(arr[i]);
+            } else if ((sum + rowCut.length) >= limit) {
+
+                cut = limit - sum;
+
+                if (row[cut - 1] === ' ') {
+                    while (cut) {
+                        cut -= 1;
+                        if (row[cut - 1] !== ' ') {
+                            break;
+                        }
+                    }
+                } else {
+
+                    add = row.substring(cut).split('').indexOf(' ');
+
+                    // break on halh of word
+                    if (!wordBreak) {
+                        if (add !== -1) {
+                            cut += add;
+                        } else {
+                            cut = row.length;
+                        }
+                    }
+                }
+
+                row = row.substring(0, cut) + suffix;
+                sum = limit;
+                more.push(row.slice(cut + suffix.length));
+
+            } else {
+                sum += rowCut.length;
+            }
+
+        } else if (sum >= limit) {
+            tagMatch = row.match(/[a-zA-Z]+/);
+
+            tagName = tagMatch ? tagMatch[0] : '';
+
+            if (tagName) {
+                if (row.substring(0, 2) !== '</') {
+
+                    tagStack.push(tagName);
+                    row = '';
+                    more.push(arr[i]);
+                } else {
+
+                    while (tagStack[tagStack.length - 1] !== tagName && tagStack.length) {
+                        tagStack.pop();
+                    }
+
+                    if (tagStack.length) {
+                        row = '';
+                        more.push(arr[i]);
+
+                    }
+
+                    tagStack.pop();
+                }
+            } else {
+                row = '';
+                more.push(arr[i]);
+
+            }
+        }
+
+        arr[i] = row;
+    }
+
+    return {
+        html: arr.join("\n").replace(/\n/g, ""),
+        more: more.join("\n").replace(/\n/g, "")
+    };
+}
