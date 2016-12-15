@@ -62,7 +62,9 @@ function dealList(data, isus) {
 
     var count = data.length;
 
+    var _data = [];
     data.forEach(function(d) {
+        // console.log(uni, d.id, uni.indexOf(d.id));
         if (uni.indexOf(d.id) === -1) {
             var id = d.id;
             sessionStorage.unique += '_' + id;
@@ -73,6 +75,7 @@ function dealList(data, isus) {
                 d.url = go_url === url ? d.buyurl : url;
                 end();
             });
+            _data.push(d);
         } else {
             end();
         }
@@ -80,10 +83,10 @@ function dealList(data, isus) {
 
     function end() {
         count--;
-        if (count === 0) {
-            console.log(data, isus);
+        if (count === 0 && _data.length) {
+            // console.log(_data, isus);
             $.post('http://zhufu.sinaapp.com/spider/spider/update_items_chr.php?debug=1', {
-                data: JSON.stringify(data),
+                data: JSON.stringify(_data),
                 isus: isus
             }, function(d) {
                 console.log(d);
