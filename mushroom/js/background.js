@@ -96,19 +96,48 @@ function p_detail(url) {
     $.get(url, function(data) {
         var $node = $(data);
         var $abs = $node.find('#mdabstract');
-        $abs.find('.m99adhead,.m99adfoot,.cheapitem').remove();
+        $abs.find('.m99adhead,.m99adfoot,.cheapitem,ul,h2,h3,h1,h4,h5').remove();
         var t = $abs.find('dt').html();
-        t = t ? t.trim() + '<br/>' : '';
+        t = t ? t.trim() : '';
+        t = t.replace(/<(span).*>(.+)<\/\1>/, '$2').replace(/&nbsp;/g, '');
         var text = [];
-        $abs.find('p').each(function(i,v){
-            text.push($(v).text().trim());
+        $abs.find('p').each(function(i, v) {
+            // $(v).find('a[isconvert]').removeAttr('isconvert');
+            var $v = $(v);
+            var withLink = false;
+            $v.find('a').each(function(n, a) {
+                if ($(a).attr('href').indexOf('guangdiu.com') !== -1) {
+                    $(a).remove();
+                } else {
+                    withLink = true;
+                }
+                $(a).removeAttr('onclick')
+
+            });
+            var others = $v.find('div,ul,img,li,dt,dl,table,a[isconvert!=1],a[isconvert!=1] img');
+            if (others.length) {
+                return;
+            }
+            var p = $v.text().trim();
+            if (withLink) {
+                p = $v.html().trim();
+                p.replace(/<a .*guangdiu.com>.*<\/a>/, '').replace(/<(span|strong).+?>(.+?)<\/\1>/g, '$2');
+            }
+            switch (p) {
+                case '海淘攻略':
+                case '':
+                    break;
+                default:
+                    text.push(p);
+            }
         });
         text = text.join('<br/>');
         if (!text) {
             $abs.find('dt').remove();
-            text = $abs.text().trim();
+            text = $abs[0].innerText.trim();
         }
-        d.resolve(t + text);
+        text = text.replace(/(<br\/>)+$/, '').replace(/^(<br\/>)+/, '');
+        d.resolve(text + (t ? '<br/>' + t : ''));
     });
 
     return d;
