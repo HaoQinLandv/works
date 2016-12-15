@@ -73,13 +73,15 @@ function dealList(data, isus) {
                 d.url = go_url === url ? d.buyurl : url;
                 end();
             });
+        } else {
+            end();
         }
     });
 
     function end() {
         count--;
         if (count === 0) {
-            // console.log(data, isus);
+            console.log(data, isus);
             $.post('http://zhufu.sinaapp.com/spider/spider/update_items_chr.php?debug=1', {
                 data: JSON.stringify(data),
                 isus: isus
